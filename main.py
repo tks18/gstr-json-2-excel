@@ -1,4 +1,6 @@
 import json
+import json_flatten
+
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
@@ -6,48 +8,41 @@ wb = Workbook()
 wb.active
 ws = wb.create_sheet(title="headings")
 
-b2b = [
-    "idt",
-    "ctin",
-    "inum",
-    "val",
-    "txvalue",
-    "rt",
-    "iamt",
-    "camt",
-    "samt",
-    "csamt",
-]
 
-b2bFormmatedDate = [
-    "Date",
-    "GSTIN",
-    "Invoice No.",
-    "Invoice Value",
-    "Taxable Value",
-    "Rate",
-    "IGST",
-    "CGST",
-    "SGST",
-    "Cess",
-]
-
-# for heading in b2b:
-#     for head in heading:
-#         # print(head)
-#         ref = f"{get_column_letter(i)}1"
-#         ws[ref] = heading[head]
-#         i += 1
-
+new_array = []
 with open("sales.json", mode="r") as salesData:
     jsonData = json.load(salesData)
-    i = 1
-    j = 2
-    b2bSales = jsonData["b2b"]
-    for sales in b2bSales:
-        ref = f"{get_column_letter(i)}{j}"
-        ws[ref] = sales
-        i += 1
-        j += 1
+    for sales in jsonData["b2b"]:
+        current_supplier = sales.copy()
+        current_supplier.pop("inv")
+        for invoice in sales["inv"]:
+            # sample_test = {
+            #     "no": invoice["inum"],
+            #     "value": invoice["itms"][0]["itm_det"]["txval"],
+            # }
+            flattenedInv = json_flatten.flatten(invoice)
+            new_array.append({**current_supplier, **flattenedInv})
+    with open("sales_flatten.json", mode="w") as sampleData:
+        json.dump(new_array, sampleData)
 
-    wb.save(filename="sample.xlsx")
+headings_map = {}
+
+i = 1
+j = 1
+for headings in set().union(*(d.keys() for d in new_array)):
+    headings_map.update({headings: f"{get_column_letter(i)}"})
+    ws[f"{get_column_letter(i)}{j}"] = headings
+    i += 1
+
+i = 1
+j = 2
+for invoice in new_array:
+    for (item, value) in invoice.items():
+        for (head_map, head_value) in headings_map.items():
+            if head_map == item:
+                ws[f"{head_value}{j}"] = value
+        i += 1
+    i = 1
+    j += 1
+
+wb.save("sample.xlsx")
