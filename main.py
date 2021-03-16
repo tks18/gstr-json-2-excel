@@ -68,7 +68,7 @@ def write_basic_data(path_to_json):
         try:
             basic_data.pop(key)
         except KeyError:
-            print(key + " Not there")
+            print(key + " Not Found")
 
     basic_data_sheet[f"{get_column_letter(4)}3"] = "Particulars"
     basic_data_sheet[f"{get_column_letter(4)}3"].font = Font(bold=True)
