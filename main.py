@@ -1,6 +1,10 @@
 import json
 from flatten_json import flatten
 
+import shutil
+
+from os import error, mkdir
+
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -14,9 +18,10 @@ basic_data = {}
 
 
 def get_user_json_directory():
-    directory = input("Enter the Sales Json Directory:  ").lower()
-    correct_dir = Path(directory)
-    return correct_dir
+    source_directory = input("Enter the Sales Json Directory:  ").lower()
+    final_directory = input("Enter the Detination Directory:  ").lower()
+    corrected_source_dir = Path(source_directory)
+    return {"source_dir": corrected_source_dir, "final_dir": final_directory}
 
 
 def get_json_sales_data(path_to_json):
@@ -38,10 +43,13 @@ def write_basic_data(path_to_json):
     }
     basic_data_sheet = work_book["Sheet"]
     basic_data_sheet.title = "Basic Data"
-    not_required_keys = ["b2b", "cdnr", "exp"]
+    not_required_keys = ["b2b", "cdnr", "exp", "b2cs", "b2cl", "b2ba", "hsn"]
     basic_data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
-        basic_data.pop(key)
+        try:
+            basic_data.pop(key)
+        except KeyError:
+            print(key + " Not there")
 
     basic_data_sheet[f"{get_column_letter(4)}3"] = "Particulars"
     basic_data_sheet[f"{get_column_letter(4)}3"].font = Font(bold=True)
@@ -70,7 +78,7 @@ def write_basic_data(path_to_json):
         basic_data_column = start_column
 
 
-def write_b2b_invoices(path_to_json):
+def write_b2b_invoices(path_to_json, destination):
     invoice_list = []
     b2b_headings_ref_map = {}
     b2b_heading_map = {
@@ -109,7 +117,7 @@ def write_b2b_invoices(path_to_json):
                 # }
                 flattened_inv = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_inv})
-        with open("b2b_sales.json", mode="w") as b2b_sales_data:
+        with open(destination + "/b2b_sales.json", mode="w") as b2b_sales_data:
             json.dump(invoice_list, b2b_sales_data)
 
         heading_column = 1
@@ -154,7 +162,7 @@ def write_b2b_invoices(path_to_json):
         print("No B2B Invoices")
 
 
-def write_b2b_credit_note_invoices(path_to_json):
+def write_b2b_credit_note_invoices(path_to_json, destination):
     invoice_list = []
     b2b_credit_notes_headings_ref_map = {}
     b2b_credit_notes_headings_map = {
@@ -193,7 +201,9 @@ def write_b2b_credit_note_invoices(path_to_json):
             for invoice in sales_returns["nt"]:
                 flattened_invoice = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_invoice})
-        with open(file="b2b_sales_returns.json", mode="w") as b2b_sales_returns_data:
+        with open(
+            file=destination + "/b2b_sales_returns.json", mode="w"
+        ) as b2b_sales_returns_data:
             json.dump(obj=invoice_list, fp=b2b_sales_returns_data)
 
         heading_column = 1
@@ -240,7 +250,77 @@ def write_b2b_credit_note_invoices(path_to_json):
         print("No Credit Note Invoices")
 
 
-def write_export_invoices(path_to_json):
+def write_b2cs_invoices(path_to_json, destination):
+    invoice_list = []
+    b2cs_sales_heading_ref_map = {}
+
+    b2cs_sales_heading_map = {
+        "samt": "SGST",
+        "camt": "CGST",
+        "typ": "Type",
+        "flag": "Flag",
+        "sply_ty": "Supply Type",
+        "chksum": "Check Sum",
+        "iamt": "IGST",
+        "txval": "Taxable Value",
+        "rt": "Rate",
+        "pos": "Place of Supply",
+    }
+
+    b2cs_sales_heading_list = [heading for heading in b2cs_sales_heading_map]
+    b2cs_sales_sheet = work_book.create_sheet(title="B2CS")
+    sales_data = get_json_sales_data(path_to_json)
+
+    for invoice in sales_data["b2cs"]:
+        flattened_invoice = flatten(invoice)
+        invoice_list.append(flattened_invoice)
+
+    with open(file=destination + "/b2cs_sales.json", mode="w") as b2cs_sales_data:
+        json.dump(obj=invoice_list, fp=b2cs_sales_data)
+
+    heading_column = 1
+    heading_row = 1
+    for headings in set().union(*(d.keys() for d in invoice_list)):
+        if headings in b2cs_sales_heading_list:
+            for (
+                formatted_keys,
+                formatted_vals,
+            ) in b2cs_sales_heading_map.items():
+                if formatted_keys == headings:
+                    b2cs_sales_heading_ref_map.update(
+                        {headings: f"{get_column_letter(heading_column)}"}
+                    )
+                    b2cs_sales_sheet[
+                        f"{get_column_letter(heading_column)}{heading_row}"
+                    ] = formatted_vals
+                    b2cs_sales_sheet[
+                        f"{get_column_letter(heading_column)}{heading_row}"
+                    ].font = Font(bold=True)
+        else:
+            b2cs_sales_heading_ref_map.update(
+                {headings: f"{get_column_letter(heading_column)}"}
+            )
+            b2cs_sales_sheet[
+                f"{get_column_letter(heading_column)}{heading_row}"
+            ] = headings
+            b2cs_sales_sheet[
+                f"{get_column_letter(heading_column)}{heading_row}"
+            ].font = Font(bold=True)
+        heading_column += 1
+
+    invoice_column = 1
+    invoice_row = 2
+    for invoice in invoice_list:
+        for (item, value) in invoice.items():
+            for (headings, excel_ref) in b2cs_sales_heading_ref_map.items():
+                if headings == item:
+                    b2cs_sales_sheet[f"{excel_ref}{invoice_row}"] = value
+            invoice_column += 1
+        invoice_column = 1
+        invoice_row += 1
+
+
+def write_export_invoices(path_to_json, destination):
     invoice_list = []
     export_heading_ref_map = {}
     export_headings_map = {
@@ -257,16 +337,19 @@ def write_export_invoices(path_to_json):
     }
     export_headings_list = [heading for heading in export_headings_map]
 
-    export_sheet = work_book.create_sheet(title="Exports")
     sales_data = get_json_sales_data(path_to_json)
     if "exp" in sales_data:
+        export_sheet = work_book.create_sheet(title="Exports")
+
         for export_sales in sales_data["exp"]:
             current_supplier = export_sales.copy()
             current_supplier.pop("inv")
             for invoice in export_sales["inv"]:
                 flattened_invoice = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_invoice})
-        with open("export_sales.json", mode="w") as export_sales_data:
+        with open(
+            Path(destination + "/export_sales.json"), mode="w"
+        ) as export_sales_data:
             json.dump(obj=invoice_list, fp=export_sales_data)
 
         heading_column = 1
@@ -313,9 +396,42 @@ def write_export_invoices(path_to_json):
         print("No Export Invoices Found")
 
 
-path_to_json = get_user_json_directory()
-write_basic_data(path_to_json)
-write_b2b_invoices(path_to_json)
-write_b2b_credit_note_invoices(path_to_json)
-write_export_invoices(path_to_json)
-work_book.save(basic_data["gstin"] + "_" + basic_data["fp"] + ".xlsx")
+def make_archive(path_to_files, file_name):
+    shutil.make_archive(base_name=file_name, format="zip", root_dir=path_to_files)
+    shutil.rmtree(path_to_files)
+
+
+user_input_dirs = get_user_json_directory()
+write_basic_data(path_to_json=user_input_dirs["source_dir"])
+
+file_name = basic_data["gstin"] + "_" + basic_data["fp"]
+file_directory = user_input_dirs["final_dir"] + "/" + file_name
+
+try:
+    corrected_dest_file = Path(user_input_dirs["final_dir"] + "/" + file_name)
+    mkdir(corrected_dest_file)
+except OSError as folder_error:
+    print(folder_error)
+else:
+    write_b2b_invoices(
+        path_to_json=user_input_dirs["source_dir"],
+        destination=file_directory,
+    )
+    write_b2b_credit_note_invoices(
+        path_to_json=user_input_dirs["source_dir"],
+        destination=file_directory,
+    )
+    write_b2cs_invoices(
+        path_to_json=user_input_dirs["source_dir"],
+        destination=file_directory,
+    )
+    write_export_invoices(
+        path_to_json=user_input_dirs["source_dir"],
+        destination=file_directory,
+    )
+    work_book.save(file_directory + "/" + file_name + ".xlsx")
+
+    try:
+        make_archive(path_to_files=file_directory, file_name=file_name)
+    except error:
+        print(error)
