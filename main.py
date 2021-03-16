@@ -1,6 +1,8 @@
 import json
 from flatten_json import flatten
 
+from pathlib import path
+
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
@@ -9,10 +11,54 @@ work_book = Workbook()
 work_book.active
 
 
+def get_user_json_directory():
+    directory = input("Enter the Sales Json Directory").lower()
+    correct_dir = path(directory)
+    return correct_dir
+
+
+def get_json_sales_data():
+    with open("sales.json", mode="r") as json_data:
+        sales_data = json.load(json_data)
+        return sales_data
+
+
+def write_basic_data():
+    basic_data_sheet = work_book["Sheet"]
+    basic_data_sheet.title = "Basic Data"
+    not_required_keys = ["b2b", "cdnr", "exp"]
+    basic_data = get_json_sales_data()
+    for key in not_required_keys:
+        basic_data.pop(key)
+
+    basic_data_sheet[f"{get_column_letter(4)}3"] = "Particulars"
+    basic_data_sheet[f"{get_column_letter(4)}3"].font = Font(bold=True)
+    basic_data_sheet[f"{get_column_letter(5)}3"] = "Value"
+    basic_data_sheet[f"{get_column_letter(5)}3"].font = Font(bold=True)
+    start_column = 4
+    basic_data_column = 4
+    basic_data_row = 4
+    for (detail_heading, detail_value) in basic_data.items():
+        basic_data_sheet[
+            f"{get_column_letter(basic_data_column)}{basic_data_row}"
+        ] = detail_heading
+        basic_data_sheet[
+            f"{get_column_letter(basic_data_column)}{basic_data_row}"
+        ].font = Font(bold=True)
+        basic_data_column += 1
+        basic_data_sheet[
+            f"{get_column_letter(basic_data_column)}{basic_data_row}"
+        ] = detail_value
+        basic_data_sheet[
+            f"{get_column_letter(basic_data_column)}{basic_data_row}"
+        ].font = Font(bold=True)
+        basic_data_row += 1
+        basic_data_column = start_column
+
+
 def write_b2b_invoices():
     invoice_list = []
     b2b_headings_ref_map = {}
-    b2b_sheet = work_book.create_sheet(title="B2B")
     b2b_heading_map = {
         "chksum": "Check Sum",
         "itms_0_itm_det_iamt": "IGST",
@@ -35,20 +81,22 @@ def write_b2b_invoices():
         "val": "Invoice Value",
     }
     b2b_heading_list = [heading for heading in b2b_heading_map]
-    with open("sales.json", mode="r") as salesData:
-        jsonData = json.load(salesData)
-        for sales in jsonData["b2b"]:
-            current_supplier = sales.copy()
-            current_supplier.pop("inv")
-            for invoice in sales["inv"]:
-                # sample_test = {
-                #     "no": invoice["inum"],
-                #     "value": invoice["itms"][0]["itm_det"]["txval"],
-                # }
-                flattenedInv = flatten(invoice)
-                invoice_list.append({**current_supplier, **flattenedInv})
-        with open("b2b_sales.json", mode="w") as sampleData:
-            json.dump(invoice_list, sampleData)
+
+    b2b_sheet = work_book.create_sheet(title="B2B")
+
+    sales_data = get_json_sales_data()
+    for sales in sales_data["b2b"]:
+        current_supplier = sales.copy()
+        current_supplier.pop("inv")
+        for invoice in sales["inv"]:
+            # sample_test = {
+            #     "no": invoice["inum"],
+            #     "value": invoice["itms"][0]["itm_det"]["txval"],
+            # }
+            flattenedInv = flatten(invoice)
+            invoice_list.append({**current_supplier, **flattenedInv})
+    with open("b2b_sales.json", mode="w") as sampleData:
+        json.dump(invoice_list, sampleData)
 
     heading_column = 1
     heading_row = 1
@@ -87,6 +135,6 @@ def write_b2b_invoices():
         invoice_row += 1
 
 
-work_book["Sheet"].title = "Basic Data"
 write_b2b_invoices()
+write_basic_data()
 work_book.save("sample.xlsx")
