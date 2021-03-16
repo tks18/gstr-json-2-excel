@@ -156,7 +156,6 @@ def write_b2b_invoices(path_to_json):
 
 def write_b2b_credit_note_invoices(path_to_json):
     invoice_list = []
-    sales_data = get_json_sales_data(path_to_json)
     b2b_credit_notes_headings_ref_map = {}
     b2b_credit_notes_headings_map = {
         "itms_0_itm_det_iamt": "IGST",
@@ -171,7 +170,7 @@ def write_b2b_credit_note_invoices(path_to_json):
         "flag": "Flag",
         "p_gst": "P GST",
         "itms_0_itm_det_camt": "CGST",
-        "ntty": "NTTY",
+        "ntty": "Credit Type",
         "ctin": "GSTIN",
         "itms_0_num": "Rate Number",
         "cflag": "C Flag",
@@ -184,57 +183,61 @@ def write_b2b_credit_note_invoices(path_to_json):
         heading for heading in b2b_credit_notes_headings_map
     ]
 
-    b2b_credit_notes_sheet = work_book.create_sheet(title="CDNR")
+    sales_data = get_json_sales_data(path_to_json)
+    if "cdnr" in sales_data:
+        b2b_credit_notes_sheet = work_book.create_sheet(title="CDNR")
 
-    for sales_returns in sales_data["cdnr"]:
-        current_supplier = sales_returns.copy()
-        current_supplier.pop("nt")
-        for invoice in sales_returns["nt"]:
-            flattened_invoice = flatten(invoice)
-            invoice_list.append({**current_supplier, **flattened_invoice})
-    with open(file="b2b_sales_returns.json", mode="w") as b2b_sales_returns_data:
-        json.dump(obj=invoice_list, fp=b2b_sales_returns_data)
+        for sales_returns in sales_data["cdnr"]:
+            current_supplier = sales_returns.copy()
+            current_supplier.pop("nt")
+            for invoice in sales_returns["nt"]:
+                flattened_invoice = flatten(invoice)
+                invoice_list.append({**current_supplier, **flattened_invoice})
+        with open(file="b2b_sales_returns.json", mode="w") as b2b_sales_returns_data:
+            json.dump(obj=invoice_list, fp=b2b_sales_returns_data)
 
-    heading_column = 1
-    heading_row = 1
-    for headings in set().union(*(d.keys() for d in invoice_list)):
-        if headings in b2b_credit_notes_headings_list:
-            for (
-                formatted_keys,
-                formatted_vals,
-            ) in b2b_credit_notes_headings_map.items():
-                if formatted_keys == headings:
-                    b2b_credit_notes_headings_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    b2b_credit_notes_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = formatted_vals
-                    b2b_credit_notes_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-        else:
-            b2b_credit_notes_headings_ref_map.update(
-                {headings: f"{get_column_letter(heading_column)}"}
-            )
-            b2b_credit_notes_sheet[
-                f"{get_column_letter(heading_column)}{heading_row}"
-            ] = headings
-            b2b_credit_notes_sheet[
-                f"{get_column_letter(heading_column)}{heading_row}"
-            ].font = Font(bold=True)
-        heading_column += 1
+        heading_column = 1
+        heading_row = 1
+        for headings in set().union(*(d.keys() for d in invoice_list)):
+            if headings in b2b_credit_notes_headings_list:
+                for (
+                    formatted_keys,
+                    formatted_vals,
+                ) in b2b_credit_notes_headings_map.items():
+                    if formatted_keys == headings:
+                        b2b_credit_notes_headings_ref_map.update(
+                            {headings: f"{get_column_letter(heading_column)}"}
+                        )
+                        b2b_credit_notes_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ] = formatted_vals
+                        b2b_credit_notes_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ].font = Font(bold=True)
+            else:
+                b2b_credit_notes_headings_ref_map.update(
+                    {headings: f"{get_column_letter(heading_column)}"}
+                )
+                b2b_credit_notes_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ] = headings
+                b2b_credit_notes_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ].font = Font(bold=True)
+            heading_column += 1
 
-    invoice_column = 1
-    invoice_row = 2
-    for invoice in invoice_list:
-        for (item, value) in invoice.items():
-            for (headings, excel_ref) in b2b_credit_notes_headings_ref_map.items():
-                if headings == item:
-                    b2b_credit_notes_sheet[f"{excel_ref}{invoice_row}"] = value
-            invoice_column += 1
         invoice_column = 1
-        invoice_row += 1
+        invoice_row = 2
+        for invoice in invoice_list:
+            for (item, value) in invoice.items():
+                for (headings, excel_ref) in b2b_credit_notes_headings_ref_map.items():
+                    if headings == item:
+                        b2b_credit_notes_sheet[f"{excel_ref}{invoice_row}"] = value
+                invoice_column += 1
+            invoice_column = 1
+            invoice_row += 1
+    else:
+        print("No Credit Note Invoices")
 
 
 path_to_json = get_user_json_directory()
