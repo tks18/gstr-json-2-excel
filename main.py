@@ -15,11 +15,30 @@ work_book = Workbook()
 work_book.active
 
 basic_data = {}
+app_mode = ""
 
 
 def get_user_json_directory():
+    global app_mode
+
     source_directory = input("Enter the Sales Json Directory:  ").lower()
     final_directory = input("Enter the Detination Directory:  ").lower()
+
+    accepted_modes = ["excel", "zipped"]
+    app_mode = input("Enter a Mode for application (excel or zipped):  ").lower()
+
+    app_mode_validation = False
+    while not app_mode_validation:
+        if app_mode not in accepted_modes:
+            print(
+                "\nPlease Enter a Valid Mode - only 'excel' or 'zipped' are allowed\n"
+            )
+            app_mode = input(
+                "Enter a Mode for application (excel or zipped):  "
+            ).lower()
+        else:
+            app_mode_validation = True
+
     corrected_source_dir = Path(source_directory)
     return {"source_dir": corrected_source_dir, "final_dir": final_directory}
 
@@ -55,6 +74,7 @@ def write_basic_data(path_to_json):
     basic_data_sheet[f"{get_column_letter(4)}3"].font = Font(bold=True)
     basic_data_sheet[f"{get_column_letter(5)}3"] = "Value"
     basic_data_sheet[f"{get_column_letter(5)}3"].font = Font(bold=True)
+
     start_column = 4
     basic_data_column = 4
     basic_data_row = 4
@@ -117,6 +137,7 @@ def write_b2b_invoices(path_to_json, destination):
                 # }
                 flattened_inv = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_inv})
+
         with open(destination + "/b2b_sales.json", mode="w") as b2b_sales_data:
             json.dump(invoice_list, b2b_sales_data)
 
@@ -201,6 +222,7 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
             for invoice in sales_returns["nt"]:
                 flattened_invoice = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_invoice})
+
         with open(
             file=destination + "/b2b_sales_returns.json", mode="w"
         ) as b2b_sales_returns_data:
@@ -347,6 +369,7 @@ def write_export_invoices(path_to_json, destination):
             for invoice in export_sales["inv"]:
                 flattened_invoice = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_invoice})
+
         with open(
             Path(destination + "/export_sales.json"), mode="w"
         ) as export_sales_data:
@@ -431,7 +454,8 @@ else:
     )
     work_book.save(file_directory + "/" + file_name + ".xlsx")
 
-    try:
-        make_archive(path_to_files=file_directory, file_name=file_name)
-    except error:
-        print(error)
+    if app_mode == "zipped":
+        try:
+            make_archive(path_to_files=file_directory, file_name=file_name)
+        except error:
+            print(error)
