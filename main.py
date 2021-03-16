@@ -240,8 +240,82 @@ def write_b2b_credit_note_invoices(path_to_json):
         print("No Credit Note Invoices")
 
 
+def write_export_invoices(path_to_json):
+    invoice_list = []
+    export_heading_ref_map = {}
+    export_headings_map = {
+        "itms_0_csamt": "Cess",
+        "itms_0_iamt": "IGST",
+        "val": "Invoice Value",
+        "itms_0_rt": "Rate",
+        "idt": "Invoice Date",
+        "exp_typ": "Exports Type",
+        "flag": "Flag",
+        "chksum": "Check Sum",
+        "itms_0_txval": "Taxable Value",
+        "inum": "Invoice Number",
+    }
+    export_headings_list = [heading for heading in export_headings_map]
+
+    export_sheet = work_book.create_sheet(title="Exports")
+    sales_data = get_json_sales_data(path_to_json)
+    if "exp" in sales_data:
+        for export_sales in sales_data["exp"]:
+            current_supplier = export_sales.copy()
+            current_supplier.pop("inv")
+            for invoice in export_sales["inv"]:
+                flattened_invoice = flatten(invoice)
+                invoice_list.append({**current_supplier, **flattened_invoice})
+        with open("export_sales.json", mode="w") as export_sales_data:
+            json.dump(obj=invoice_list, fp=export_sales_data)
+
+        heading_column = 1
+        heading_row = 1
+        for headings in set().union(*(d.keys() for d in invoice_list)):
+            if headings in export_headings_list:
+                for (
+                    formatted_keys,
+                    formatted_vals,
+                ) in export_headings_map.items():
+                    if formatted_keys == headings:
+                        export_heading_ref_map.update(
+                            {headings: f"{get_column_letter(heading_column)}"}
+                        )
+                        export_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ] = formatted_vals
+                        export_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ].font = Font(bold=True)
+            else:
+                export_heading_ref_map.update(
+                    {headings: f"{get_column_letter(heading_column)}"}
+                )
+                export_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ] = headings
+                export_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ].font = Font(bold=True)
+            heading_column += 1
+
+        invoice_column = 1
+        invoice_row = 2
+        for invoice in invoice_list:
+            for (item, value) in invoice.items():
+                for (headings, excel_ref) in export_heading_ref_map.items():
+                    if headings == item:
+                        export_sheet[f"{excel_ref}{invoice_row}"] = value
+                invoice_column += 1
+            invoice_column = 1
+            invoice_row += 1
+    else:
+        print("No Export Invoices Found")
+
+
 path_to_json = get_user_json_directory()
-write_b2b_invoices(path_to_json)
 write_basic_data(path_to_json)
+write_b2b_invoices(path_to_json)
 write_b2b_credit_note_invoices(path_to_json)
+write_export_invoices(path_to_json)
 work_book.save(basic_data["gstin"] + "_" + basic_data["fp"] + ".xlsx")
