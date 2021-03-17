@@ -2,6 +2,8 @@ import pyfiglet
 from itertools import cycle
 from time import sleep
 
+import glob
+
 import json
 from flatten_json import flatten
 
@@ -24,9 +26,32 @@ def clear():
 
 
 def get_user_json_directory():
-    global app_mode, allowed_modes
+    global app_mode, allowed_modes, app_generation_mode, allowed_generation_modes
 
-    source_directory = input("\n\nEnter the Sales Json Directory:  ").lower()
+    app_generation_mode = input(
+        "\n\nEnter a App Working Mode (single or directory):  "
+    ).lower()
+
+    app_generation_validation = False
+    while not app_generation_validation:
+        if app_generation_mode not in allowed_generation_modes:
+            print(
+                "\nPlease Enter a Valid Working Mode - only 'single' or 'directory' is allowed\n"
+            )
+            app_generation_mode = input(
+                "\n\nEnter a App Working Mode (single or directory):  "
+            ).lower()
+        else:
+            app_generation_validation = True
+
+    if app_generation_mode == "single":
+        source_directory = input("\nEnter the Sales JSON Directory:  ").lower()
+    elif app_generation_mode == "directory":
+        print("\n!! Ensure the Directory only has JSON files !!\n")
+        source_directory = input(
+            "\nEnter a Directory where all the JSONs are located:  "
+        ).lower()
+
     final_directory = input("\nEnter the Detination Directory:  ").lower()
 
     app_mode = input(
@@ -45,12 +70,16 @@ def get_user_json_directory():
         else:
             app_mode_validation = True
 
-    corrected_source_dir = Path(source_directory)
+    corrected_source_dir = (
+        Path(source_directory)
+        if app_generation_mode == "single"
+        else source_directory + "\\*.json"
+    )
     return {"source_dir": corrected_source_dir, "final_dir": final_directory}
 
 
 def get_json_sales_data(path_to_json):
-    with open(path_to_json, mode="r") as json_data:
+    with open(file=path_to_json, mode="r") as json_data:
         sales_data = json.load(json_data)
         return sales_data
 
@@ -598,72 +627,84 @@ restart_app = True
 
 while restart_app:
 
-    work_book = Workbook()
-    work_book.active
-
     basic_data = {}
     app_mode = ""
+    app_generation_mode = ""
 
+    allowed_generation_modes = ["single", "directory"]
     allowed_modes = ["excel", "json", "zipped", "excel-json"]
     create_file_dir_modes = ["excel-json", "zipped", "json"]
     create_excel_dir_modes = ["excel-json", "zipped", "excel"]
 
     user_input_dirs = get_user_json_directory()
-    write_basic_data(path_to_json=user_input_dirs["source_dir"])
 
-    file_name = basic_data["gstin"] + "_" + basic_data["fp"]
-    file_directory = (
-        user_input_dirs["final_dir"] + "/" + file_name
-        if app_mode in create_file_dir_modes
-        else user_input_dirs["final_dir"]
-    )
+    json_files = []
+    if app_generation_mode == "single":
+        json_files.append(user_input_dirs["source_dir"])
+    elif app_generation_mode == "directory":
+        for json_file in glob.glob(user_input_dirs["source_dir"]):
+            json_files.append(Path(json_file.lower()))
 
-    try:
-        if app_mode in create_file_dir_modes:
-            corrected_dest_file = Path(user_input_dirs["final_dir"] + "/" + file_name)
-            mkdir(corrected_dest_file)
-    except OSError as folder_error:
-        print(folder_error)
-    else:
-        write_b2b_invoices(
-            path_to_json=user_input_dirs["source_dir"],
-            destination=file_directory,
-        )
-        write_b2b_credit_note_invoices(
-            path_to_json=user_input_dirs["source_dir"],
-            destination=file_directory,
-        )
-        write_b2cs_invoices(
-            path_to_json=user_input_dirs["source_dir"],
-            destination=file_directory,
-        )
-        write_export_invoices(
-            path_to_json=user_input_dirs["source_dir"],
-            destination=file_directory,
-        )
-        write_b2ba_invoices(
-            path_to_json=user_input_dirs["source_dir"], destination=file_directory
-        )
-        if app_mode in create_excel_dir_modes:
-            work_book.save(file_directory + "/" + file_name + ".xlsx")
+    for json_file in json_files:
 
-        if app_mode == "zipped":
-            try:
-                make_archive(path_to_files=file_directory, file_name=file_name)
-            except error:
-                print(error)
+        work_book = Workbook()
+        work_book.active
 
-        restart_app_input = input("\nDo You want to Generate another? (y/n)  ").lower()
-        restart_app_validation = False
-        while not restart_app_validation:
-            if restart_app_input not in ["y", "n"]:
-                print("\nOnly (y/n) is Accepted\n")
-                restart_app_input = input(
-                    "\nDo You want to Generate another? (y/n)  "
-                ).lower()
-            else:
-                restart_app_validation = True
+        write_basic_data(path_to_json=json_file)
 
-        restart_app = True if restart_app_input == "y" else False
-        if restart_app:
-            clear()
+        file_name = basic_data["gstin"] + "_" + basic_data["fp"]
+        file_directory = (
+            user_input_dirs["final_dir"] + "/" + file_name
+            if app_mode in create_file_dir_modes
+            else user_input_dirs["final_dir"]
+        )
+
+        try:
+            if app_mode in create_file_dir_modes:
+                corrected_dest_file = Path(
+                    user_input_dirs["final_dir"] + "/" + file_name
+                )
+                mkdir(corrected_dest_file)
+        except OSError as folder_error:
+            print(folder_error)
+        else:
+            write_b2b_invoices(
+                path_to_json=json_file,
+                destination=file_directory,
+            )
+            write_b2b_credit_note_invoices(
+                path_to_json=json_file,
+                destination=file_directory,
+            )
+            write_b2cs_invoices(
+                path_to_json=json_file,
+                destination=file_directory,
+            )
+            write_export_invoices(
+                path_to_json=json_file,
+                destination=file_directory,
+            )
+            write_b2ba_invoices(path_to_json=json_file, destination=file_directory)
+            if app_mode in create_excel_dir_modes:
+                work_book.save(file_directory + "/" + file_name + ".xlsx")
+
+            if app_mode == "zipped":
+                try:
+                    make_archive(path_to_files=file_directory, file_name=file_name)
+                except error:
+                    print(error)
+
+    restart_app_input = input("\nDo You want to Generate another? (y/n)  ").lower()
+    restart_app_validation = False
+    while not restart_app_validation:
+        if restart_app_input not in ["y", "n"]:
+            print("\nOnly (y/n) is Accepted\n")
+            restart_app_input = input(
+                "\nDo You want to Generate another? (y/n)  "
+            ).lower()
+        else:
+            restart_app_validation = True
+
+    restart_app = True if restart_app_input == "y" else False
+    if restart_app:
+        clear()
