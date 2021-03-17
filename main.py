@@ -472,60 +472,62 @@ def write_b2ba_invoices(path_to_json, destination):
 
     b2ba_heading_list = [heading for heading in b2ba_heading_map]
     sales_data = get_json_sales_data(path_to_json)
-    b2ba_sheet = work_book.create_sheet(title="B2BA")
+    if "b2ba" in sales_data:
+        b2ba_sheet = work_book.create_sheet(title="B2BA")
 
-    for b2ba_sales in sales_data["b2ba"]:
-        current_supplier = b2ba_sales.copy()
-        current_supplier.pop("inv")
-        for invoice in b2ba_sales["inv"]:
-            flattened_invoice = flatten(invoice)
-            invoice_list.append({**current_supplier, **flattened_invoice})
+        for b2ba_sales in sales_data["b2ba"]:
+            current_supplier = b2ba_sales.copy()
+            current_supplier.pop("inv")
+            for invoice in b2ba_sales["inv"]:
+                flattened_invoice = flatten(invoice)
+                invoice_list.append({**current_supplier, **flattened_invoice})
 
-    if app_mode in create_file_dir_modes:
-        with open(
-            Path(destination + "/b2ba_sales.json"), mode="w"
-        ) as export_sales_data:
-            json.dump(obj=invoice_list, fp=export_sales_data)
+        if app_mode in create_file_dir_modes:
+            with open(
+                Path(destination + "/b2ba_sales.json"), mode="w"
+            ) as export_sales_data:
+                json.dump(obj=invoice_list, fp=export_sales_data)
 
-    heading_column = 1
-    heading_row = 1
-    for headings in set().union(*(d.keys() for d in invoice_list)):
-        if headings in b2ba_heading_list:
-            for (
-                formatted_keys,
-                formatted_vals,
-            ) in b2ba_heading_map.items():
-                if formatted_keys == headings:
-                    b2ba_heading_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    b2ba_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = formatted_vals
-                    b2ba_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-        else:
-            b2ba_heading_ref_map.update(
-                {headings: f"{get_column_letter(heading_column)}"}
-            )
-            b2ba_sheet[f"{get_column_letter(heading_column)}{heading_row}"] = headings
-            b2ba_sheet[f"{get_column_letter(heading_column)}{heading_row}"].font = Font(
-                bold=True
-            )
-        heading_column += 1
+        heading_column = 1
+        heading_row = 1
+        for headings in set().union(*(d.keys() for d in invoice_list)):
+            if headings in b2ba_heading_list:
+                for (
+                    formatted_keys,
+                    formatted_vals,
+                ) in b2ba_heading_map.items():
+                    if formatted_keys == headings:
+                        b2ba_heading_ref_map.update(
+                            {headings: f"{get_column_letter(heading_column)}"}
+                        )
+                        b2ba_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ] = formatted_vals
+                        b2ba_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ].font = Font(bold=True)
+            else:
+                b2ba_heading_ref_map.update(
+                    {headings: f"{get_column_letter(heading_column)}"}
+                )
+                b2ba_sheet[f"{get_column_letter(heading_column)}{heading_row}"] = headings
+                b2ba_sheet[f"{get_column_letter(heading_column)}{heading_row}"].font = Font(
+                    bold=True
+                )
+            heading_column += 1
 
-    invoice_column = 1
-    invoice_row = 2
-    for invoice in invoice_list:
-        for (item, value) in invoice.items():
-            for (headings, excel_ref) in b2ba_heading_ref_map.items():
-                if headings == item:
-                    b2ba_sheet[f"{excel_ref}{invoice_row}"] = value
-            invoice_column += 1
         invoice_column = 1
-        invoice_row += 1
-
+        invoice_row = 2
+        for invoice in invoice_list:
+            for (item, value) in invoice.items():
+                for (headings, excel_ref) in b2ba_heading_ref_map.items():
+                    if headings == item:
+                        b2ba_sheet[f"{excel_ref}{invoice_row}"] = value
+                invoice_column += 1
+            invoice_column = 1
+            invoice_row += 1
+    else:
+        print("> No B2BA Invoices Found in JSON")
 
 def make_archive(path_to_files, file_name):
     shutil.make_archive(base_name=file_name, format="zip", root_dir=path_to_files)
