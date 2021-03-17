@@ -1,9 +1,13 @@
+import pyfiglet
+from itertools import cycle
+from time import sleep
+
 import json
 from flatten_json import flatten
 
 import shutil
 
-from os import error, mkdir
+from os import system, name, error, mkdir
 
 from pathlib import Path
 
@@ -11,27 +15,29 @@ from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
 
-work_book = Workbook()
-work_book.active
 
-basic_data = {}
-app_mode = ""
+def clear():
+    if name == "nt":
+        _ = system("cls")
+    else:
+        _ = system("clear")
 
 
 def get_user_json_directory():
     global app_mode
 
-    source_directory = input("Enter the Sales Json Directory:  ").lower()
-    final_directory = input("Enter the Detination Directory:  ").lower()
+    source_directory = input("\n\nEnter the Sales Json Directory:  ").lower()
+    final_directory = input("\nEnter the Detination Directory:  ").lower()
 
-    accepted_modes = ["excel", "zipped"]
-    app_mode = input("Enter a Mode for application (excel or zipped):  ").lower()
+    app_mode = input(
+        "\nEnter a Mode for application (excel or zipped or excel-json):  "
+    ).lower()
 
     app_mode_validation = False
     while not app_mode_validation:
-        if app_mode not in accepted_modes:
+        if app_mode not in ["excel", "zipped", "excel-json"]:
             print(
-                "\nPlease Enter a Valid Mode - only 'excel' or 'zipped' are allowed\n"
+                "\nPlease Enter a Valid Mode - only 'excel' or 'zipped' or 'excel-json' are allowed\n"
             )
             app_mode = input(
                 "Enter a Mode for application (excel or zipped):  "
@@ -68,7 +74,7 @@ def write_basic_data(path_to_json):
         try:
             basic_data.pop(key)
         except KeyError:
-            print(key + " Not Found")
+            print("> " + key + " Not Found")
 
     basic_data_sheet[f"{get_column_letter(4)}3"] = "Particulars"
     basic_data_sheet[f"{get_column_letter(4)}3"].font = Font(bold=True)
@@ -99,6 +105,8 @@ def write_basic_data(path_to_json):
 
 
 def write_b2b_invoices(path_to_json, destination):
+    global create_file_dir_modes
+
     invoice_list = []
     b2b_headings_ref_map = {}
     b2b_heading_map = {
@@ -138,8 +146,9 @@ def write_b2b_invoices(path_to_json, destination):
                 flattened_inv = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_inv})
 
-        with open(destination + "/b2b_sales.json", mode="w") as b2b_sales_data:
-            json.dump(invoice_list, b2b_sales_data)
+        if app_mode in create_file_dir_modes:
+            with open(destination + "/b2b_sales.json", mode="w") as b2b_sales_data:
+                json.dump(invoice_list, b2b_sales_data)
 
         heading_column = 1
         heading_row = 1
@@ -180,10 +189,12 @@ def write_b2b_invoices(path_to_json, destination):
             invoice_row += 1
 
     else:
-        print("No B2B Invoices")
+        print("> No B2B Invoices Found in JSON")
 
 
 def write_b2b_credit_note_invoices(path_to_json, destination):
+    global create_file_dir_modes
+
     invoice_list = []
     b2b_credit_notes_headings_ref_map = {}
     b2b_credit_notes_headings_map = {
@@ -223,10 +234,11 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
                 flattened_invoice = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_invoice})
 
-        with open(
-            file=destination + "/b2b_sales_returns.json", mode="w"
-        ) as b2b_sales_returns_data:
-            json.dump(obj=invoice_list, fp=b2b_sales_returns_data)
+        if app_mode in create_file_dir_modes:
+            with open(
+                file=destination + "/b2b_sales_returns.json", mode="w"
+            ) as b2b_sales_returns_data:
+                json.dump(obj=invoice_list, fp=b2b_sales_returns_data)
 
         heading_column = 1
         heading_row = 1
@@ -269,10 +281,12 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
             invoice_column = 1
             invoice_row += 1
     else:
-        print("No Credit Note Invoices")
+        print("> No B2B Credit Notes Found in JSON")
 
 
 def write_b2cs_invoices(path_to_json, destination):
+    global create_file_dir_modes
+
     invoice_list = []
     b2cs_sales_heading_ref_map = {}
 
@@ -290,59 +304,68 @@ def write_b2cs_invoices(path_to_json, destination):
     }
 
     b2cs_sales_heading_list = [heading for heading in b2cs_sales_heading_map]
-    b2cs_sales_sheet = work_book.create_sheet(title="B2CS")
+
     sales_data = get_json_sales_data(path_to_json)
+    if "b2cs" in sales_data:
+        b2cs_sales_sheet = work_book.create_sheet(title="B2CS")
 
-    for invoice in sales_data["b2cs"]:
-        flattened_invoice = flatten(invoice)
-        invoice_list.append(flattened_invoice)
+        for invoice in sales_data["b2cs"]:
+            flattened_invoice = flatten(invoice)
+            invoice_list.append(flattened_invoice)
 
-    with open(file=destination + "/b2cs_sales.json", mode="w") as b2cs_sales_data:
-        json.dump(obj=invoice_list, fp=b2cs_sales_data)
+        if app_mode in create_file_dir_modes:
+            with open(
+                file=destination + "/b2cs_sales.json", mode="w"
+            ) as b2cs_sales_data:
+                json.dump(obj=invoice_list, fp=b2cs_sales_data)
 
-    heading_column = 1
-    heading_row = 1
-    for headings in set().union(*(d.keys() for d in invoice_list)):
-        if headings in b2cs_sales_heading_list:
-            for (
-                formatted_keys,
-                formatted_vals,
-            ) in b2cs_sales_heading_map.items():
-                if formatted_keys == headings:
-                    b2cs_sales_heading_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    b2cs_sales_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = formatted_vals
-                    b2cs_sales_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-        else:
-            b2cs_sales_heading_ref_map.update(
-                {headings: f"{get_column_letter(heading_column)}"}
-            )
-            b2cs_sales_sheet[
-                f"{get_column_letter(heading_column)}{heading_row}"
-            ] = headings
-            b2cs_sales_sheet[
-                f"{get_column_letter(heading_column)}{heading_row}"
-            ].font = Font(bold=True)
-        heading_column += 1
+        heading_column = 1
+        heading_row = 1
+        for headings in set().union(*(d.keys() for d in invoice_list)):
+            if headings in b2cs_sales_heading_list:
+                for (
+                    formatted_keys,
+                    formatted_vals,
+                ) in b2cs_sales_heading_map.items():
+                    if formatted_keys == headings:
+                        b2cs_sales_heading_ref_map.update(
+                            {headings: f"{get_column_letter(heading_column)}"}
+                        )
+                        b2cs_sales_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ] = formatted_vals
+                        b2cs_sales_sheet[
+                            f"{get_column_letter(heading_column)}{heading_row}"
+                        ].font = Font(bold=True)
+            else:
+                b2cs_sales_heading_ref_map.update(
+                    {headings: f"{get_column_letter(heading_column)}"}
+                )
+                b2cs_sales_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ] = headings
+                b2cs_sales_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ].font = Font(bold=True)
+            heading_column += 1
 
-    invoice_column = 1
-    invoice_row = 2
-    for invoice in invoice_list:
-        for (item, value) in invoice.items():
-            for (headings, excel_ref) in b2cs_sales_heading_ref_map.items():
-                if headings == item:
-                    b2cs_sales_sheet[f"{excel_ref}{invoice_row}"] = value
-            invoice_column += 1
         invoice_column = 1
-        invoice_row += 1
+        invoice_row = 2
+        for invoice in invoice_list:
+            for (item, value) in invoice.items():
+                for (headings, excel_ref) in b2cs_sales_heading_ref_map.items():
+                    if headings == item:
+                        b2cs_sales_sheet[f"{excel_ref}{invoice_row}"] = value
+                invoice_column += 1
+            invoice_column = 1
+            invoice_row += 1
+    else:
+        print("> No B2CS Invoices Found in JSON")
 
 
 def write_export_invoices(path_to_json, destination):
+    global create_file_dir_modes
+
     invoice_list = []
     export_heading_ref_map = {}
     export_headings_map = {
@@ -370,10 +393,11 @@ def write_export_invoices(path_to_json, destination):
                 flattened_invoice = flatten(invoice)
                 invoice_list.append({**current_supplier, **flattened_invoice})
 
-        with open(
-            Path(destination + "/export_sales.json"), mode="w"
-        ) as export_sales_data:
-            json.dump(obj=invoice_list, fp=export_sales_data)
+        if app_mode in create_file_dir_modes:
+            with open(
+                Path(destination + "/export_sales.json"), mode="w"
+            ) as export_sales_data:
+                json.dump(obj=invoice_list, fp=export_sales_data)
 
         heading_column = 1
         heading_row = 1
@@ -416,7 +440,7 @@ def write_export_invoices(path_to_json, destination):
             invoice_column = 1
             invoice_row += 1
     else:
-        print("No Export Invoices Found")
+        print("> No Export Invoices Found in JSON")
 
 
 def make_archive(path_to_files, file_name):
@@ -424,38 +448,84 @@ def make_archive(path_to_files, file_name):
     shutil.rmtree(path_to_files)
 
 
-user_input_dirs = get_user_json_directory()
-write_basic_data(path_to_json=user_input_dirs["source_dir"])
+clear()
 
-file_name = basic_data["gstin"] + "_" + basic_data["fp"]
-file_directory = user_input_dirs["final_dir"] + "/" + file_name
+title = "GSTR 1 Json to Excel Utility"
+subtitle = pyfiglet.figlet_format("Shan.tk")
 
-try:
-    corrected_dest_file = Path(user_input_dirs["final_dir"] + "/" + file_name)
-    mkdir(corrected_dest_file)
-except OSError as folder_error:
-    print(folder_error)
-else:
-    write_b2b_invoices(
-        path_to_json=user_input_dirs["source_dir"],
-        destination=file_directory,
-    )
-    write_b2b_credit_note_invoices(
-        path_to_json=user_input_dirs["source_dir"],
-        destination=file_directory,
-    )
-    write_b2cs_invoices(
-        path_to_json=user_input_dirs["source_dir"],
-        destination=file_directory,
-    )
-    write_export_invoices(
-        path_to_json=user_input_dirs["source_dir"],
-        destination=file_directory,
-    )
-    work_book.save(file_directory + "/" + file_name + ".xlsx")
+print("\n" + title + "\n" + "by" + "\n" + subtitle + "\n")
 
-    if app_mode == "zipped":
-        try:
-            make_archive(path_to_files=file_directory, file_name=file_name)
-        except error:
-            print(error)
+spinner_time = 1
+for frame in cycle(r"-\|/"):
+    print("\r", frame, sep="", end=" Initializing Application", flush=True)
+    sleep(0.2)
+    if spinner_time == 15:
+        break
+    spinner_time += 1
+
+restart_app = True
+
+while restart_app:
+
+    work_book = Workbook()
+    work_book.active
+
+    basic_data = {}
+    app_mode = ""
+
+    user_input_dirs = get_user_json_directory()
+    write_basic_data(path_to_json=user_input_dirs["source_dir"])
+
+    create_file_dir_modes = ["excel-json", "zipped"]
+    file_name = basic_data["gstin"] + "_" + basic_data["fp"]
+    file_directory = (
+        user_input_dirs["final_dir"] + "/" + file_name
+        if app_mode in create_file_dir_modes
+        else user_input_dirs["final_dir"]
+    )
+
+    try:
+        if app_mode in create_file_dir_modes:
+            corrected_dest_file = Path(user_input_dirs["final_dir"] + "/" + file_name)
+            mkdir(corrected_dest_file)
+    except OSError as folder_error:
+        print(folder_error)
+    else:
+        write_b2b_invoices(
+            path_to_json=user_input_dirs["source_dir"],
+            destination=file_directory,
+        )
+        write_b2b_credit_note_invoices(
+            path_to_json=user_input_dirs["source_dir"],
+            destination=file_directory,
+        )
+        write_b2cs_invoices(
+            path_to_json=user_input_dirs["source_dir"],
+            destination=file_directory,
+        )
+        write_export_invoices(
+            path_to_json=user_input_dirs["source_dir"],
+            destination=file_directory,
+        )
+        work_book.save(file_directory + "/" + file_name + ".xlsx")
+
+        if app_mode == "zipped":
+            try:
+                make_archive(path_to_files=file_directory, file_name=file_name)
+            except error:
+                print(error)
+
+        restart_app_input = input("\nDo You want to Generate another? (y/n)  ").lower()
+        restart_app_validation = False
+        while not restart_app_validation:
+            if restart_app_input not in ["y", "n"]:
+                print("\nOnly (y/n) is Accepted\n")
+                restart_app_input = input(
+                    "\nDo You want to Generate another? (y/n)  "
+                ).lower()
+            else:
+                restart_app_validation = True
+
+        restart_app = True if restart_app_input == "y" else False
+        if restart_app:
+            clear()
