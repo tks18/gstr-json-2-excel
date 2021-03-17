@@ -510,10 +510,12 @@ def write_b2ba_invoices(path_to_json, destination):
                 b2ba_heading_ref_map.update(
                     {headings: f"{get_column_letter(heading_column)}"}
                 )
-                b2ba_sheet[f"{get_column_letter(heading_column)}{heading_row}"] = headings
-                b2ba_sheet[f"{get_column_letter(heading_column)}{heading_row}"].font = Font(
-                    bold=True
-                )
+                b2ba_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ] = headings
+                b2ba_sheet[
+                    f"{get_column_letter(heading_column)}{heading_row}"
+                ].font = Font(bold=True)
             heading_column += 1
 
         invoice_column = 1
@@ -528,6 +530,7 @@ def write_b2ba_invoices(path_to_json, destination):
             invoice_row += 1
     else:
         print("> No B2BA Invoices Found in JSON")
+
 
 def make_archive(path_to_files, file_name):
     shutil.make_archive(base_name=file_name, format="zip", root_dir=path_to_files)
