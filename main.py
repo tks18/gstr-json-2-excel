@@ -25,6 +25,23 @@ def clear():
         _ = system("clear")
 
 
+def init_app():
+    clear()
+
+    title = "GSTR 1 Json to Excel Utility"
+    subtitle = pyfiglet.figlet_format("Shan.tk")
+
+    print("\n" + title + "\n" + "by" + "\n" + subtitle + "\n")
+
+    spinner_time = 1
+    for frame in cycle(r"-\|/"):
+        print("\r", frame, sep="", end=" Initializing Application", flush=True)
+        sleep(0.2)
+        if spinner_time == 15:
+            break
+        spinner_time += 1
+
+
 def get_user_json_directory():
     global app_mode, allowed_modes, app_generation_mode, allowed_generation_modes
 
@@ -47,7 +64,7 @@ def get_user_json_directory():
     if app_generation_mode == "single":
         source_directory = input("\nEnter the Sales JSON Directory:  ").lower()
     elif app_generation_mode == "directory":
-        print("\n!! Ensure the Directory only has JSON files !!\n")
+        print("\n!! Ensure the Directory only has JSON files !!")
         source_directory = input(
             "\nEnter a Directory where all the JSONs are located:  "
         ).lower()
@@ -101,7 +118,15 @@ def write_basic_data(path_to_json):
         try:
             basic_data.pop(key)
         except KeyError:
-            print("> " + key + " Not Found")
+            print(
+                "> "
+                + basic_data["gstin"]
+                + "_"
+                + basic_data["fp"]
+                + " "
+                + key
+                + " Not Found"
+            )
 
     if app_mode in create_excel_dir_modes:
         basic_data_sheet = work_book["Sheet"]
@@ -136,7 +161,7 @@ def write_basic_data(path_to_json):
 
 
 def write_b2b_invoices(path_to_json, destination):
-    global create_file_dir_modes, app_mode, create_excel_dir_modes
+    global file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
     b2b_headings_ref_map = {}
@@ -182,7 +207,9 @@ def write_b2b_invoices(path_to_json, destination):
                     invoice_list.append({**current_supplier, **flattened_inv})
 
         if app_mode in create_file_dir_modes:
-            with open(destination + "/b2b_sales.json", mode="w") as b2b_sales_data:
+            with open(
+                destination + "/" + file_name + "_b2b_sales.json", mode="w"
+            ) as b2b_sales_data:
                 json.dump(invoice_list, b2b_sales_data)
 
         if app_mode in create_excel_dir_modes:
@@ -226,11 +253,11 @@ def write_b2b_invoices(path_to_json, destination):
                 invoice_row += 1
 
     else:
-        print("> No B2B Invoices Found in JSON")
+        print("> " + file_name + " No B2B Invoices Found in JSON")
 
 
 def write_b2b_credit_note_invoices(path_to_json, destination):
-    global create_file_dir_modes, app_mode, create_excel_dir_modes
+    global file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
     b2b_credit_notes_headings_ref_map = {}
@@ -281,7 +308,7 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
 
         if app_mode in create_file_dir_modes:
             with open(
-                file=destination + "/b2b_sales_returns.json", mode="w"
+                file=destination + "/" + file_name + "_b2b_sales_returns.json", mode="w"
             ) as b2b_sales_returns_data:
                 json.dump(obj=invoice_list, fp=b2b_sales_returns_data)
 
@@ -331,11 +358,11 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
                 invoice_column = 1
                 invoice_row += 1
     else:
-        print("> No B2B Credit Notes Found in JSON")
+        print("> " + file_name + " No B2B Credit Notes Found in JSON")
 
 
 def write_b2cs_invoices(path_to_json, destination):
-    global create_file_dir_modes, app_mode, create_excel_dir_modes
+    global file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
     b2cs_sales_heading_ref_map = {}
@@ -364,7 +391,7 @@ def write_b2cs_invoices(path_to_json, destination):
 
         if app_mode in create_file_dir_modes:
             with open(
-                file=destination + "/b2cs_sales.json", mode="w"
+                file=destination + "/" + file_name + "_b2cs_sales.json", mode="w"
             ) as b2cs_sales_data:
                 json.dump(obj=invoice_list, fp=b2cs_sales_data)
 
@@ -411,11 +438,11 @@ def write_b2cs_invoices(path_to_json, destination):
                 invoice_column = 1
                 invoice_row += 1
     else:
-        print("> No B2CS Invoices Found in JSON")
+        print("> " + file_name + " No B2CS Invoices Found in JSON")
 
 
 def write_export_invoices(path_to_json, destination):
-    global create_file_dir_modes, app_mode, create_excel_dir_modes
+    global file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
     export_heading_ref_map = {}
@@ -454,7 +481,7 @@ def write_export_invoices(path_to_json, destination):
 
         if app_mode in create_file_dir_modes:
             with open(
-                Path(destination + "/export_sales.json"), mode="w"
+                Path(destination + "/" + file_name + "_export_sales.json"), mode="w"
             ) as export_sales_data:
                 json.dump(obj=invoice_list, fp=export_sales_data)
 
@@ -501,11 +528,11 @@ def write_export_invoices(path_to_json, destination):
                 invoice_column = 1
                 invoice_row += 1
     else:
-        print("> No Export Invoices Found in JSON")
+        print("> " + file_name + " No Export Invoices Found in JSON")
 
 
 def write_b2ba_invoices(path_to_json, destination):
-    global create_file_dir_modes, app_mode, create_excel_dir_modes
+    global file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
     b2ba_heading_ref_map = {}
@@ -553,7 +580,7 @@ def write_b2ba_invoices(path_to_json, destination):
 
         if app_mode in create_file_dir_modes:
             with open(
-                Path(destination + "/b2ba_sales.json"), mode="w"
+                Path(destination + "/" + file_name + "_b2ba_sales.json"), mode="w"
             ) as export_sales_data:
                 json.dump(obj=invoice_list, fp=export_sales_data)
 
@@ -600,7 +627,7 @@ def write_b2ba_invoices(path_to_json, destination):
                 invoice_column = 1
                 invoice_row += 1
     else:
-        print("> No B2BA Invoices Found in JSON")
+        print("> " + file_name + " No B2BA Invoices Found in JSON")
 
 
 def make_archive(path_to_files, file_name):
@@ -608,20 +635,7 @@ def make_archive(path_to_files, file_name):
     shutil.rmtree(path_to_files)
 
 
-clear()
-
-title = "GSTR 1 Json to Excel Utility"
-subtitle = pyfiglet.figlet_format("Shan.tk")
-
-print("\n" + title + "\n" + "by" + "\n" + subtitle + "\n")
-
-spinner_time = 1
-for frame in cycle(r"-\|/"):
-    print("\r", frame, sep="", end=" Initializing Application", flush=True)
-    sleep(0.2)
-    if spinner_time == 15:
-        break
-    spinner_time += 1
+init_app()
 
 restart_app = True
 
@@ -645,6 +659,7 @@ while restart_app:
         for json_file in glob.glob(user_input_dirs["source_dir"]):
             json_files.append(Path(json_file.lower()))
 
+    print("\nRunning Application Log Drain <<>>\n")
     for json_file in json_files:
 
         work_book = Workbook()
@@ -694,7 +709,7 @@ while restart_app:
                 except error:
                     print(error)
 
-    restart_app_input = input("\nDo You want to Generate another? (y/n)  ").lower()
+    restart_app_input = input("\nDo You want to Restart the app? (y/n)  ").lower()
     restart_app_validation = False
     while not restart_app_validation:
         if restart_app_input not in ["y", "n"]:
