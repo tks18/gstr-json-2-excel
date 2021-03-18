@@ -10,10 +10,10 @@ Open Source Gstr 1 Json to Excel utility based on Python. Useful for Auditors in
 * B2B Credit Notes
 * Exports
 * B2C Sales
+* B2B Amended Invoices
 
 ### To be Done
 
-* B2B Amended Invoices
 * B2C Amended Invoices
 * HSN Summary
 
