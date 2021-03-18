@@ -1,3 +1,4 @@
 *.json
 *.xlsx
 __pycache__
+build
