@@ -1,7 +1,6 @@
 import glob
 
 import json
-from tkinter import messagebox
 from flatten_json import flatten
 
 import shutil
@@ -11,7 +10,7 @@ from os import error, mkdir, startfile
 from pathlib import Path
 
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
