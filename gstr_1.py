@@ -6,7 +6,7 @@ from flatten_json import flatten
 
 import shutil
 
-from os import error, mkdir
+from os import error, mkdir, startfile
 
 from pathlib import Path
 
@@ -23,28 +23,49 @@ def get_user_json_directory():
     global source_dir_label, final_dir_label
 
     if len(app_generation_mode) > 1:
-
         app_status_text.config(text="Status - Getting Directories")
 
         if app_generation_mode == "single":
-            source_directory = filedialog.askopenfilename()
+            source_directory = filedialog.askopenfilename(
+                title="Select the JSON File You want to Process",
+                filetypes=[("Json", "*.json")],
+            )
         elif app_generation_mode == "directory":
-            source_directory = filedialog.askdirectory()
+            source_directory = filedialog.askdirectory(
+                title="Select the Folder where all the JSON Files are Located",
+            )
 
-        source_dir_label.config(text="Source:  " + source_directory.lower())
+        if len(source_directory) > 2:
+            source_dir_label.config(text="Source:  " + source_directory.lower())
 
-        final_directory = filedialog.askdirectory()
-        final_dir_label.config(text="Destination: " + final_directory.lower())
+            final_directory = filedialog.askdirectory(
+                title="Select the Destination Directory to Store the Excel Files after Processing"
+            )
 
-        corrected_source_dir = (
-            Path(source_directory.lower())
-            if app_generation_mode == "single"
-            else source_directory.lower() + "\\*.json"
-        )
-        return {
-            "source_dir": corrected_source_dir,
-            "final_dir": final_directory.lower(),
-        }
+            if len(final_directory) > 2:
+                final_dir_label.config(text="Destination: " + final_directory.lower())
+
+            corrected_source_dir = (
+                Path(source_directory.lower())
+                if app_generation_mode == "single"
+                else source_directory.lower() + "\\*.json"
+            )
+
+            ready_to_process = (
+                True
+                if len(source_directory) > 2 and len(final_directory) > 2
+                else False
+            )
+
+            return {
+                "ready_to_process": ready_to_process,
+                "source_dir": corrected_source_dir,
+                "final_dir": final_directory.lower(),
+            }
+
+        else:
+            app_status_text.config(text="Status - Ready to Process")
+            return {"ready_to_process": False, "source_dir": "", "final_dir": ""}
 
 
 def get_json_sales_data(path_to_json):
@@ -604,62 +625,79 @@ def start_gstr_1_process():
     global work_book, file_name, file_directory, source_dir_label, final_dir_label
 
     user_input_dirs = get_user_json_directory()
-    user_confirmation_dialog = messagebox.askyesno(
-        title="Confirm Proceed",
-        message="Are You Sure with the Details you have Provided ?",
-    )
 
-    if user_confirmation_dialog:
-        json_files = []
-        if app_generation_mode == "single":
-            json_files.append(user_input_dirs["source_dir"])
-        elif app_generation_mode == "directory":
-            app_status_text.config(text="Status - Batch Processing the Files")
-            for json_file in glob.glob(user_input_dirs["source_dir"]):
-                json_files.append(Path(json_file.lower()))
-
-        for json_file in json_files:
-
-            work_book = Workbook()
-            work_book.active
-
-            write_basic_data(path_to_json=json_file)
-
-            file_name = basic_data["gstin"] + "_" + basic_data["fp"]
-            file_directory = (
-                user_input_dirs["final_dir"] + "/" + file_name
-                if app_mode in create_file_dir_modes
-                else user_input_dirs["final_dir"]
-            )
-
-            try:
-                if app_mode in create_file_dir_modes:
-                    corrected_dest_file = Path(
-                        user_input_dirs["final_dir"] + "/" + file_name
-                    )
-                    mkdir(corrected_dest_file)
-            except OSError as folder_error:
-                app_status_text.config(
-                    text="Status - Error - " + file_name + " - " + folder_error
-                )
-            else:
-                write_all_invoices(
-                    app_mode=app_mode,
-                    create_excel_dir_modes=create_excel_dir_modes,
-                    path_to_json=json_file,
-                    file_directory=file_directory,
-                    file_name=file_name,
-                )
-
-        restart_app_input = messagebox.askyesno(
-            title="Restart App",
-            message="App has Finished Processing the Files\n\nDo you like to Restart the App ?",
+    if user_input_dirs["ready_to_process"]:
+        user_confirmation_dialog = messagebox.askyesno(
+            title="Confirm Proceed",
+            message="Are You Sure with the Details you have Provided ?",
         )
-        if restart_app_input:
+
+        if user_confirmation_dialog:
+            json_files = []
+            if app_generation_mode == "single":
+                json_files.append(user_input_dirs["source_dir"])
+            elif app_generation_mode == "directory":
+                app_status_text.config(text="Status - Batch Processing the Files")
+                for json_file in glob.glob(user_input_dirs["source_dir"]):
+                    json_files.append(Path(json_file.lower()))
+
+            for json_file in json_files:
+
+                work_book = Workbook()
+                work_book.active
+
+                write_basic_data(path_to_json=json_file)
+
+                file_name = basic_data["gstin"] + "_" + basic_data["fp"]
+                file_directory = (
+                    user_input_dirs["final_dir"] + "/" + file_name
+                    if app_mode in create_file_dir_modes
+                    else user_input_dirs["final_dir"]
+                )
+
+                try:
+                    if app_mode in create_file_dir_modes:
+                        corrected_dest_file = Path(
+                            user_input_dirs["final_dir"] + "/" + file_name
+                        )
+                        mkdir(corrected_dest_file)
+                except OSError as folder_error:
+                    app_status_text.config(
+                        text="Status - Error - " + file_name + " - " + folder_error
+                    )
+                else:
+                    write_all_invoices(
+                        app_mode=app_mode,
+                        create_excel_dir_modes=create_excel_dir_modes,
+                        path_to_json=json_file,
+                        file_directory=file_directory,
+                        file_name=file_name,
+                    )
+
+                    if (
+                        app_mode in ["json", "excel-json"]
+                        and app_generation_mode == "single"
+                    ):
+                        startfile(
+                            user_input_dirs["final_dir"] + "/" + file_name, "open"
+                        )
+                    else:
+                        startfile(user_input_dirs["final_dir"], "open")
+
+            restart_app_input = messagebox.askyesno(
+                title="Restart App",
+                message="App has Finished Processing the Files\n\nDo you like to Restart the App ?",
+            )
+            if restart_app_input:
+                source_dir_label.config(text=" ")
+                final_dir_label.config(text=" ")
+            else:
+                gstr_1_ui.destroy()
+
+        else:
+            app_status_text.config(text="Status - Ready to Process")
             source_dir_label.config(text=" ")
             final_dir_label.config(text=" ")
-        else:
-            gstr_1_ui.destroy()
 
 
 def set_app_generation_mode():
