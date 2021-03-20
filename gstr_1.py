@@ -1,76 +1,19 @@
 import glob
-
-import json
-from flatten_json import flatten
-
-import shutil
-
 from os import error, mkdir, startfile
-
 from pathlib import Path
-
 import tkinter as tk
-from tkinter import filedialog, messagebox
-
+from tkinter import messagebox
 from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font
 
-
-def get_user_json_directory():
-    global app_mode, allowed_modes, app_generation_mode, allowed_generation_modes
-    global source_dir_label, final_dir_label
-
-    if len(app_generation_mode) > 1:
-        app_status_text.config(text="Status - Getting Directories")
-
-        if app_generation_mode == "single":
-            source_directory = filedialog.askopenfilename(
-                title="Select the JSON File You want to Process",
-                filetypes=[("Json", "*.json")],
-            )
-        elif app_generation_mode == "directory":
-            source_directory = filedialog.askdirectory(
-                title="Select the Folder where all the JSON Files are Located",
-            )
-
-        if len(source_directory) > 2:
-            source_dir_label.config(text="Source:  " + source_directory.lower())
-
-            final_directory = filedialog.askdirectory(
-                title="Select the Destination Directory to Store the Excel Files after Processing"
-            )
-
-            if len(final_directory) > 2:
-                final_dir_label.config(text="Destination: " + final_directory.lower())
-
-            corrected_source_dir = (
-                Path(source_directory.lower())
-                if app_generation_mode == "single"
-                else source_directory.lower() + "\\*.json"
-            )
-
-            ready_to_process = (
-                True
-                if len(source_directory) > 2 and len(final_directory) > 2
-                else False
-            )
-
-            return {
-                "ready_to_process": ready_to_process,
-                "source_dir": corrected_source_dir,
-                "final_dir": final_directory.lower(),
-            }
-
-        else:
-            app_status_text.config(text="Status - Ready to Process")
-            return {"ready_to_process": False, "source_dir": "", "final_dir": ""}
-
-
-def get_json_sales_data(path_to_json):
-    with open(file=path_to_json, mode="r") as json_data:
-        sales_data = json.load(json_data)
-        return sales_data
+# Other Imports
+from helpers import (
+    get_user_json_directory,
+    get_json_sales_data,
+    write_basic_data_sheet,
+    generate_invoices_list,
+    write_invoices_to_excel,
+    make_archive,
+)
 
 
 def write_basic_data(path_to_json):
@@ -94,39 +37,17 @@ def write_basic_data(path_to_json):
         basic_data_sheet = work_book["Sheet"]
         basic_data_sheet.title = "Basic Data"
 
-        basic_data_sheet[f"{get_column_letter(4)}3"] = "Particulars"
-        basic_data_sheet[f"{get_column_letter(4)}3"].font = Font(bold=True)
-        basic_data_sheet[f"{get_column_letter(5)}3"] = "Value"
-        basic_data_sheet[f"{get_column_letter(5)}3"].font = Font(bold=True)
-
-        start_column = 4
-        basic_data_column = 4
-        basic_data_row = 4
-        for (detail_heading, detail_value) in basic_data.items():
-            for (basic_head, basic_value) in basic_data_heading_map.items():
-                if basic_head == detail_heading:
-                    basic_data_sheet[
-                        f"{get_column_letter(basic_data_column)}{basic_data_row}"
-                    ] = basic_value
-                    basic_data_sheet[
-                        f"{get_column_letter(basic_data_column)}{basic_data_row}"
-                    ].font = Font(bold=True)
-            basic_data_column += 1
-            basic_data_sheet[
-                f"{get_column_letter(basic_data_column)}{basic_data_row}"
-            ] = detail_value
-            basic_data_sheet[
-                f"{get_column_letter(basic_data_column)}{basic_data_row}"
-            ].font = Font(bold=True)
-            basic_data_row += 1
-            basic_data_column = start_column
+        write_basic_data_sheet(
+            work_sheet=basic_data_sheet,
+            basic_data=basic_data,
+            heading_map=basic_data_heading_map,
+        )
 
 
 def write_b2b_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2b_headings_ref_map = {}
     b2b_heading_map = {
         "chksum": "Check Sum",
         "itms_0_itm_det_iamt": "IGST",
@@ -152,74 +73,29 @@ def write_b2b_invoices(path_to_json, destination):
 
     sales_data = get_json_sales_data(path_to_json)
     if "b2b" in sales_data:
-        for sales in sales_data["b2b"]:
-            current_supplier = sales.copy()
-            current_supplier.pop("inv")
-            for invoice in sales["inv"]:
-                current_invoice = invoice.copy()
-                if len(invoice["itms"]) > 1:
-                    current_invoice.pop("itms")
-                    for current_inv_item in invoice["itms"]:
-                        new_invoice = current_invoice.copy()
-                        new_invoice["itms"] = [current_inv_item]
-                        flattened_inv = flatten(new_invoice)
-                        invoice_list.append({**current_supplier, **flattened_inv})
-                else:
-                    flattened_inv = flatten(invoice)
-                    invoice_list.append({**current_supplier, **flattened_inv})
-
-        if app_mode in create_file_dir_modes:
-            with open(
-                destination + "/" + file_name + "_b2b_sales.json", mode="w"
-            ) as b2b_sales_data:
-                json.dump(invoice_list, b2b_sales_data)
+        invoice_list = generate_invoices_list(
+            sales_data=sales_data,
+            sales_type="b2b",
+            invoice_term="inv",
+            app_mode=app_mode,
+            create_file_dir_modes=create_file_dir_modes,
+            file_name=destination + "/" + file_name + "_b2b_sales.json",
+        )
 
         if app_mode in create_excel_dir_modes:
             b2b_sheet = work_book.create_sheet("B2B")
-            heading_column = 1
-            heading_row = 1
-            for headings in set().union(*(d.keys() for d in invoice_list)):
-                if headings in b2b_heading_list:
-                    for (formatted_keys, formatted_vals) in b2b_heading_map.items():
-                        if formatted_keys == headings:
-                            b2b_headings_ref_map.update(
-                                {headings: f"{get_column_letter(heading_column)}"}
-                            )
-                            b2b_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ] = formatted_vals
-                            b2b_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ].font = Font(bold=True)
-                else:
-                    b2b_headings_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    b2b_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = headings
-                    b2b_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-                heading_column += 1
-
-            invoice_column = 1
-            invoice_row = 2
-            for invoice in invoice_list:
-                for (item, value) in invoice.items():
-                    for (headings, excel_ref) in b2b_headings_ref_map.items():
-                        if headings == item:
-                            b2b_sheet[f"{excel_ref}{invoice_row}"] = value
-                    invoice_column += 1
-                invoice_column = 1
-                invoice_row += 1
+            write_invoices_to_excel(
+                work_sheet=b2b_sheet,
+                invoice_list=invoice_list,
+                heading_map=b2b_heading_map,
+                heading_list=b2b_heading_list,
+            )
 
 
 def write_b2b_credit_note_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2b_credit_notes_headings_ref_map = {}
     b2b_credit_notes_headings_map = {
         "itms_0_itm_det_iamt": "IGST",
         "updby": "Updated by",
@@ -248,82 +124,29 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
 
     sales_data = get_json_sales_data(path_to_json)
     if "cdnr" in sales_data:
-
-        for sales_returns in sales_data["cdnr"]:
-            current_supplier = sales_returns.copy()
-            current_supplier.pop("nt")
-            for invoice in sales_returns["nt"]:
-                current_invoice = invoice.copy()
-                if len(invoice["itms"]) > 1:
-                    current_invoice.pop("itms")
-                    for current_inv_item in invoice["itms"]:
-                        new_invoice = current_invoice.copy()
-                        new_invoice["itms"] = [current_inv_item]
-                        flattened_inv = flatten(new_invoice)
-                        invoice_list.append({**current_supplier, **flattened_inv})
-                else:
-                    flattened_inv = flatten(invoice)
-                    invoice_list.append({**current_supplier, **flattened_inv})
-
-        if app_mode in create_file_dir_modes:
-            with open(
-                file=destination + "/" + file_name + "_b2b_sales_returns.json", mode="w"
-            ) as b2b_sales_returns_data:
-                json.dump(obj=invoice_list, fp=b2b_sales_returns_data)
+        invoice_list = generate_invoices_list(
+            sales_data=sales_data,
+            sales_type="cdnr",
+            invoice_term="nt",
+            app_mode=app_mode,
+            create_file_dir_modes=create_file_dir_modes,
+            file_name=destination + "/" + file_name + "_b2b_sales_returns.json",
+        )
 
         if app_mode in create_excel_dir_modes:
             b2b_credit_notes_sheet = work_book.create_sheet(title="CDNR")
-            heading_column = 1
-            heading_row = 1
-            for headings in set().union(*(d.keys() for d in invoice_list)):
-                if headings in b2b_credit_notes_headings_list:
-                    for (
-                        formatted_keys,
-                        formatted_vals,
-                    ) in b2b_credit_notes_headings_map.items():
-                        if formatted_keys == headings:
-                            b2b_credit_notes_headings_ref_map.update(
-                                {headings: f"{get_column_letter(heading_column)}"}
-                            )
-                            b2b_credit_notes_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ] = formatted_vals
-                            b2b_credit_notes_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ].font = Font(bold=True)
-                else:
-                    b2b_credit_notes_headings_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    b2b_credit_notes_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = headings
-                    b2b_credit_notes_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-                heading_column += 1
-
-            invoice_column = 1
-            invoice_row = 2
-            for invoice in invoice_list:
-                for (item, value) in invoice.items():
-                    for (
-                        headings,
-                        excel_ref,
-                    ) in b2b_credit_notes_headings_ref_map.items():
-                        if headings == item:
-                            b2b_credit_notes_sheet[f"{excel_ref}{invoice_row}"] = value
-                    invoice_column += 1
-                invoice_column = 1
-                invoice_row += 1
+            write_invoices_to_excel(
+                work_sheet=b2b_credit_notes_sheet,
+                invoice_list=invoice_list,
+                heading_map=b2b_credit_notes_headings_map,
+                heading_list=b2b_credit_notes_headings_list,
+            )
 
 
 def write_b2cs_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2cs_sales_heading_ref_map = {}
-
     b2cs_sales_heading_map = {
         "samt": "SGST",
         "camt": "CGST",
@@ -342,65 +165,29 @@ def write_b2cs_invoices(path_to_json, destination):
     sales_data = get_json_sales_data(path_to_json)
     if "b2cs" in sales_data:
 
-        for invoice in sales_data["b2cs"]:
-            flattened_invoice = flatten(invoice)
-            invoice_list.append(flattened_invoice)
-
-        if app_mode in create_file_dir_modes:
-            with open(
-                file=destination + "/" + file_name + "_b2cs_sales.json", mode="w"
-            ) as b2cs_sales_data:
-                json.dump(obj=invoice_list, fp=b2cs_sales_data)
+        invoice_list = generate_invoices_list(
+            sales_data=sales_data,
+            sales_type="b2cs",
+            invoice_term="inv",
+            app_mode=app_mode,
+            create_file_dir_modes=create_file_dir_modes,
+            file_name=destination + "/" + file_name + "_b2cs_sales.json",
+        )
 
         if app_mode in create_excel_dir_modes:
             b2cs_sales_sheet = work_book.create_sheet(title="B2CS")
-            heading_column = 1
-            heading_row = 1
-            for headings in set().union(*(d.keys() for d in invoice_list)):
-                if headings in b2cs_sales_heading_list:
-                    for (
-                        formatted_keys,
-                        formatted_vals,
-                    ) in b2cs_sales_heading_map.items():
-                        if formatted_keys == headings:
-                            b2cs_sales_heading_ref_map.update(
-                                {headings: f"{get_column_letter(heading_column)}"}
-                            )
-                            b2cs_sales_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ] = formatted_vals
-                            b2cs_sales_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ].font = Font(bold=True)
-                else:
-                    b2cs_sales_heading_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    b2cs_sales_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = headings
-                    b2cs_sales_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-                heading_column += 1
-
-            invoice_column = 1
-            invoice_row = 2
-            for invoice in invoice_list:
-                for (item, value) in invoice.items():
-                    for (headings, excel_ref) in b2cs_sales_heading_ref_map.items():
-                        if headings == item:
-                            b2cs_sales_sheet[f"{excel_ref}{invoice_row}"] = value
-                    invoice_column += 1
-                invoice_column = 1
-                invoice_row += 1
+            write_invoices_to_excel(
+                work_sheet=b2cs_sales_sheet,
+                invoice_list=invoice_list,
+                heading_map=b2cs_sales_heading_map,
+                heading_list=b2cs_sales_heading_list,
+            )
 
 
 def write_export_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    export_heading_ref_map = {}
     export_headings_map = {
         "itms_0_csamt": "Cess",
         "itms_0_iamt": "IGST",
@@ -418,77 +205,29 @@ def write_export_invoices(path_to_json, destination):
     sales_data = get_json_sales_data(path_to_json)
     if "exp" in sales_data:
 
-        for export_sales in sales_data["exp"]:
-            current_supplier = export_sales.copy()
-            current_supplier.pop("inv")
-            for invoice in export_sales["inv"]:
-                current_invoice = invoice.copy()
-                if len(invoice["itms"]) > 1:
-                    current_invoice.pop("itms")
-                    for current_inv_item in invoice["itms"]:
-                        new_invoice = current_invoice.copy()
-                        new_invoice["itms"] = [current_inv_item]
-                        flattened_inv = flatten(new_invoice)
-                        invoice_list.append({**current_supplier, **flattened_inv})
-                else:
-                    flattened_inv = flatten(invoice)
-                    invoice_list.append({**current_supplier, **flattened_inv})
-
-        if app_mode in create_file_dir_modes:
-            with open(
-                Path(destination + "/" + file_name + "_export_sales.json"), mode="w"
-            ) as export_sales_data:
-                json.dump(obj=invoice_list, fp=export_sales_data)
+        invoice_list = generate_invoices_list(
+            sales_data=sales_data,
+            sales_type="exp",
+            invoice_term="inv",
+            app_mode=app_mode,
+            create_file_dir_modes=create_file_dir_modes,
+            file_name=destination + "/" + file_name + "_export_sales.json",
+        )
 
         if app_mode in create_excel_dir_modes:
             export_sheet = work_book.create_sheet(title="Exports")
-            heading_column = 1
-            heading_row = 1
-            for headings in set().union(*(d.keys() for d in invoice_list)):
-                if headings in export_headings_list:
-                    for (
-                        formatted_keys,
-                        formatted_vals,
-                    ) in export_headings_map.items():
-                        if formatted_keys == headings:
-                            export_heading_ref_map.update(
-                                {headings: f"{get_column_letter(heading_column)}"}
-                            )
-                            export_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ] = formatted_vals
-                            export_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ].font = Font(bold=True)
-                else:
-                    export_heading_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    export_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = headings
-                    export_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-                heading_column += 1
-
-            invoice_column = 1
-            invoice_row = 2
-            for invoice in invoice_list:
-                for (item, value) in invoice.items():
-                    for (headings, excel_ref) in export_heading_ref_map.items():
-                        if headings == item:
-                            export_sheet[f"{excel_ref}{invoice_row}"] = value
-                    invoice_column += 1
-                invoice_column = 1
-                invoice_row += 1
+            write_invoices_to_excel(
+                work_sheet=export_sheet,
+                invoice_list=invoice_list,
+                heading_map=export_headings_map,
+                heading_list=export_headings_list,
+            )
 
 
 def write_b2ba_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2ba_heading_ref_map = {}
     b2ba_heading_map = {
         "idt": "Invoice Date",
         "inv_typ": "Invoice Type",
@@ -515,75 +254,23 @@ def write_b2ba_invoices(path_to_json, destination):
     sales_data = get_json_sales_data(path_to_json)
     if "b2ba" in sales_data:
 
-        for b2ba_sales in sales_data["b2ba"]:
-            current_supplier = b2ba_sales.copy()
-            current_supplier.pop("inv")
-            for invoice in b2ba_sales["inv"]:
-                current_invoice = invoice.copy()
-                if len(invoice["itms"]) > 1:
-                    current_invoice.pop("itms")
-                    for current_inv_item in invoice["itms"]:
-                        new_invoice = current_invoice.copy()
-                        new_invoice["itms"] = [current_inv_item]
-                        flattened_inv = flatten(new_invoice)
-                        invoice_list.append({**current_supplier, **flattened_inv})
-                else:
-                    flattened_inv = flatten(invoice)
-                    invoice_list.append({**current_supplier, **flattened_inv})
-
-        if app_mode in create_file_dir_modes:
-            with open(
-                Path(destination + "/" + file_name + "_b2ba_sales.json"), mode="w"
-            ) as export_sales_data:
-                json.dump(obj=invoice_list, fp=export_sales_data)
+        invoice_list = generate_invoices_list(
+            sales_data=sales_data,
+            sales_type="b2ba",
+            invoice_term="inv",
+            app_mode=app_mode,
+            create_file_dir_modes=create_file_dir_modes,
+            file_name=destination + "/" + file_name + "_b2ba_sales.json",
+        )
 
         if app_mode in create_excel_dir_modes:
             b2ba_sheet = work_book.create_sheet(title="B2BA")
-            heading_column = 1
-            heading_row = 1
-            for headings in set().union(*(d.keys() for d in invoice_list)):
-                if headings in b2ba_heading_list:
-                    for (
-                        formatted_keys,
-                        formatted_vals,
-                    ) in b2ba_heading_map.items():
-                        if formatted_keys == headings:
-                            b2ba_heading_ref_map.update(
-                                {headings: f"{get_column_letter(heading_column)}"}
-                            )
-                            b2ba_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ] = formatted_vals
-                            b2ba_sheet[
-                                f"{get_column_letter(heading_column)}{heading_row}"
-                            ].font = Font(bold=True)
-                else:
-                    b2ba_heading_ref_map.update(
-                        {headings: f"{get_column_letter(heading_column)}"}
-                    )
-                    b2ba_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ] = headings
-                    b2ba_sheet[
-                        f"{get_column_letter(heading_column)}{heading_row}"
-                    ].font = Font(bold=True)
-                heading_column += 1
-
-            invoice_column = 1
-            invoice_row = 2
-            for invoice in invoice_list:
-                for (item, value) in invoice.items():
-                    for (headings, excel_ref) in b2ba_heading_ref_map.items():
-                        if headings == item:
-                            b2ba_sheet[f"{excel_ref}{invoice_row}"] = value
-                    invoice_column += 1
-                invoice_column = 1
-                invoice_row += 1
-
-
-def make_archive(path_to_files, file_name):
-    shutil.make_archive(base_name=file_name, format="zip", root_dir=path_to_files)
-    shutil.rmtree(path_to_files)
+            write_invoices_to_excel(
+                work_sheet=b2ba_sheet,
+                invoice_list=invoice_list,
+                heading_map=b2ba_heading_map,
+                heading_list=b2ba_heading_list,
+            )
 
 
 def write_all_invoices(
@@ -620,10 +307,15 @@ def write_all_invoices(
 
 def start_gstr_1_process():
     global basic_data, app_mode, app_generation_mode, app_status_text
-    global allowed_generation_modes, allowed_modes, create_file_dir_modes, create_excel_dir_modes
+    global create_file_dir_modes, create_excel_dir_modes
     global work_book, file_name, file_directory, source_dir_label, final_dir_label
 
-    user_input_dirs = get_user_json_directory()
+    user_input_dirs = get_user_json_directory(
+        app_generation_mode=app_generation_mode,
+        source_dir_label=source_dir_label,
+        final_dir_label=final_dir_label,
+        status_text=app_status_text,
+    )
 
     if user_input_dirs["ready_to_process"]:
         user_confirmation_dialog = messagebox.askyesno(
@@ -817,8 +509,6 @@ app_processing_mode_var = None
 
 app_status_text = None
 
-allowed_generation_modes = ["single", "directory"]
-allowed_modes = ["excel", "json", "zipped", "excel-json"]
 create_file_dir_modes = ["excel-json", "zipped", "json"]
 create_excel_dir_modes = ["excel-json", "zipped", "excel"]
 

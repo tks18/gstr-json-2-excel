@@ -52,8 +52,10 @@ def open_gstr_1_window():
     main_ui.destroy()
     gstr_1_utils.start_window_app()
 
+
 def restart_window():
     main_ui_window()
+
 
 main_ui = None
 
