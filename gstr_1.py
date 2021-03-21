@@ -79,7 +79,7 @@ def write_b2b_invoices(path_to_json, destination):
             invoice_term="inv",
             app_mode=app_mode,
             create_file_dir_modes=create_file_dir_modes,
-            file_name=destination + "/" + file_name + "_b2b_sales.json",
+            file_name=destination + "/" + file_name + "GSTR1_b2b_sales.json",
         )
 
         if app_mode in create_excel_dir_modes:
@@ -130,7 +130,7 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
             invoice_term="nt",
             app_mode=app_mode,
             create_file_dir_modes=create_file_dir_modes,
-            file_name=destination + "/" + file_name + "_b2b_sales_returns.json",
+            file_name=destination + "/" + file_name + "GSTR1_b2b_sales_returns.json",
         )
 
         if app_mode in create_excel_dir_modes:
@@ -171,7 +171,7 @@ def write_b2cs_invoices(path_to_json, destination):
             invoice_term="inv",
             app_mode=app_mode,
             create_file_dir_modes=create_file_dir_modes,
-            file_name=destination + "/" + file_name + "_b2cs_sales.json",
+            file_name=destination + "/" + file_name + "GSTR1_b2cs_sales.json",
         )
 
         if app_mode in create_excel_dir_modes:
@@ -211,7 +211,7 @@ def write_export_invoices(path_to_json, destination):
             invoice_term="inv",
             app_mode=app_mode,
             create_file_dir_modes=create_file_dir_modes,
-            file_name=destination + "/" + file_name + "_export_sales.json",
+            file_name=destination + "/" + file_name + "GSTR1_export_sales.json",
         )
 
         if app_mode in create_excel_dir_modes:
@@ -260,7 +260,7 @@ def write_b2ba_invoices(path_to_json, destination):
             invoice_term="inv",
             app_mode=app_mode,
             create_file_dir_modes=create_file_dir_modes,
-            file_name=destination + "/" + file_name + "_b2ba_sales.json",
+            file_name=destination + "/" + file_name + "GSTR1_b2ba_sales.json",
         )
 
         if app_mode in create_excel_dir_modes:
@@ -311,9 +311,9 @@ def write_all_invoices(
 
 
 def start_gstr_1_process():
-    global basic_data, app_mode, app_generation_mode, app_status_text
+    global basic_data, app_mode, app_generation_mode
     global create_file_dir_modes, create_excel_dir_modes
-    global work_book, file_name, file_directory, source_dir_label, final_dir_label
+    global work_book, file_name, file_directory
 
     user_input_dirs = get_user_json_directory(
         app_generation_mode=app_generation_mode,
@@ -369,7 +369,7 @@ def start_gstr_1_process():
                         file_directory=file_directory,
                         file_name=file_name,
                         zip_file_name=Path(
-                            user_input_dirs["final_dir"] + "/" + file_name
+                            user_input_dirs["final_dir"] + "/GSTR1_" + file_name
                         ),
                     )
 
@@ -400,20 +400,19 @@ def start_gstr_1_process():
 
 
 def set_app_generation_mode():
-    global app_generation_mode, app_generation_mode_var
+    global app_generation_mode
 
     app_generation_mode = gstr_1_ui.app_generation_mode_var.get()
 
 
 def set_app_processing_mode():
-    global app_mode, app_processing_mode_var
+    global app_mode
 
     app_mode = gstr_1_ui.app_processing_mode_var.get()
 
 
 def start_window_app():
-    global gstr_1_ui, app_generation_mode_var, app_processing_mode_var
-    global app_status_text, source_dir_label, final_dir_label
+    global gstr_1_ui
 
     gstr_1_ui = gst_utils_ui(
         window_title="GSTR 1 Utils",

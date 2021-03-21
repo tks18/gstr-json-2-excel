@@ -1,4 +1,5 @@
 import gstr_1 as gstr_1_utils
+import gstr_2 as gstr_2_utils
 
 from tkinter import *
 from tkinter import messagebox
@@ -8,6 +9,8 @@ def main_ui_window():
     global main_ui
 
     main_ui = Tk()
+    icon = PhotoImage(file="images/logo.png")
+    main_ui.iconphoto(False, icon)
     main_ui.title("GSTR Utils by Shan.tk")
     main_ui.config(padx=50, pady=50)
 
@@ -23,7 +26,7 @@ def main_ui_window():
             "row": 2,
             "column": 0,
         },
-        {"title": "GSTR 2", "command": display_message, "row": 2, "column": 1},
+        {"title": "GSTR 2", "command": open_gstr_2_window, "row": 2, "column": 1},
     ]
 
     utility_label = Label(text="Select the utility which you want to open:")
@@ -40,17 +43,18 @@ def main_ui_window():
     main_ui.mainloop()
 
 
-def display_message():
-    messagebox.showinfo(
-        title="Work in Progress", message="GSTR 2 Utility is under Progress."
-    )
-
-
 def open_gstr_1_window():
     global main_ui
 
     main_ui.destroy()
     gstr_1_utils.start_window_app()
+
+
+def open_gstr_2_window():
+    global main_ui
+
+    main_ui.destroy()
+    gstr_2_utils.start_window_app()
 
 
 def restart_window():
