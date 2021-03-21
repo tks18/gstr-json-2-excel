@@ -442,5 +442,3 @@ work_book = None
 
 file_name = ""
 file_directory = ""
-
-start_window_app()
