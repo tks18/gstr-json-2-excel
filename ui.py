@@ -1,4 +1,5 @@
 import tkinter as tk
+from helpers import resource_path
 
 
 class gst_utils_ui:
@@ -6,7 +7,7 @@ class gst_utils_ui:
         self.ui = tk.Tk()
         self.ui.title(window_title)
         self.ui.config(padx=100, pady=80)
-        self.icon = tk.PhotoImage(file="images/logo.png")
+        self.icon = tk.PhotoImage(file=resource_path("images/logo.png"))
         self.ui.iconphoto(False, self.icon)
         self.main_title = tk.Label(
             master=self.ui,

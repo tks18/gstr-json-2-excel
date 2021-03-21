@@ -2,14 +2,14 @@ import gstr_1 as gstr_1_utils
 import gstr_2 as gstr_2_utils
 
 from tkinter import *
-from tkinter import messagebox
+from helpers import resource_path
 
 
 def main_ui_window():
     global main_ui
 
     main_ui = Tk()
-    icon = PhotoImage(file="images/logo.png")
+    icon = PhotoImage(file=resource_path("images/logo.png"))
     main_ui.iconphoto(False, icon)
     main_ui.title("GSTR Utils by Shan.tk")
     main_ui.config(padx=50, pady=50)
