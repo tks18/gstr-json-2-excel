@@ -1,11 +1,11 @@
 import glob
 from os import error, mkdir, startfile
 from pathlib import Path
-import tkinter as tk
 from tkinter import messagebox
 from openpyxl import Workbook
 
 # Other Imports
+from ui import gst_utils_ui
 from helpers import (
     get_user_json_directory,
     get_json_sales_data,
@@ -274,7 +274,12 @@ def write_b2ba_invoices(path_to_json, destination):
 
 
 def write_all_invoices(
-    app_mode, create_excel_dir_modes, path_to_json, file_directory, file_name
+    app_mode,
+    create_excel_dir_modes,
+    path_to_json,
+    file_directory,
+    file_name,
+    zip_file_name,
 ):
     global work_book
 
@@ -300,7 +305,7 @@ def write_all_invoices(
 
     if app_mode == "zipped":
         try:
-            make_archive(path_to_files=file_directory, file_name=file_name)
+            make_archive(path_to_files=file_directory, file_name=zip_file_name)
         except error:
             print(error)
 
@@ -312,9 +317,9 @@ def start_gstr_1_process():
 
     user_input_dirs = get_user_json_directory(
         app_generation_mode=app_generation_mode,
-        source_dir_label=source_dir_label,
-        final_dir_label=final_dir_label,
-        status_text=app_status_text,
+        source_dir_label=gstr_1_ui.source_dir_label,
+        final_dir_label=gstr_1_ui.final_dir_label,
+        status_text=gstr_1_ui.app_status_text,
     )
 
     if user_input_dirs["ready_to_process"]:
@@ -328,7 +333,9 @@ def start_gstr_1_process():
             if app_generation_mode == "single":
                 json_files.append(user_input_dirs["source_dir"])
             elif app_generation_mode == "directory":
-                app_status_text.config(text="Status - Batch Processing the Files")
+                gstr_1_ui.app_status_text.config(
+                    text="Status - Batch Processing the Files"
+                )
                 for json_file in glob.glob(user_input_dirs["source_dir"]):
                     json_files.append(Path(json_file.lower()))
 
@@ -352,10 +359,8 @@ def start_gstr_1_process():
                             user_input_dirs["final_dir"] + "/" + file_name
                         )
                         mkdir(corrected_dest_file)
-                except OSError as folder_error:
-                    app_status_text.config(
-                        text="Status - Error - " + file_name + " - " + folder_error
-                    )
+                except OSError:
+                    gstr_1_ui.app_status_text.config(text="Status - Folder Error - ")
                 else:
                     write_all_invoices(
                         app_mode=app_mode,
@@ -363,6 +368,9 @@ def start_gstr_1_process():
                         path_to_json=json_file,
                         file_directory=file_directory,
                         file_name=file_name,
+                        zip_file_name=Path(
+                            user_input_dirs["final_dir"] + "/" + file_name
+                        ),
                     )
 
                     if (
@@ -380,122 +388,44 @@ def start_gstr_1_process():
                 message="App has Finished Processing the Files\n\nDo you like to Restart the App ?",
             )
             if restart_app_input:
-                source_dir_label.config(text=" ")
-                final_dir_label.config(text=" ")
+                gstr_1_ui.source_dir_label.config(text=" ")
+                gstr_1_ui.final_dir_label.config(text=" ")
             else:
-                gstr_1_ui.destroy()
+                gstr_1_ui.close_window()
 
         else:
-            app_status_text.config(text="Status - Ready to Process")
-            source_dir_label.config(text=" ")
-            final_dir_label.config(text=" ")
+            gstr_1_ui.app_status_text.config(text="Status - Ready to Process")
+            gstr_1_ui.source_dir_label.config(text=" ")
+            gstr_1_ui.final_dir_label.config(text=" ")
 
 
 def set_app_generation_mode():
     global app_generation_mode, app_generation_mode_var
 
-    app_generation_mode = app_generation_mode_var.get()
+    app_generation_mode = gstr_1_ui.app_generation_mode_var.get()
 
 
 def set_app_processing_mode():
     global app_mode, app_processing_mode_var
 
-    app_mode = app_processing_mode_var.get()
+    app_mode = gstr_1_ui.app_processing_mode_var.get()
 
 
 def start_window_app():
     global gstr_1_ui, app_generation_mode_var, app_processing_mode_var
     global app_status_text, source_dir_label, final_dir_label
 
-    gstr_1_ui = tk.Tk()
-    gstr_1_ui.title("GSTR 1 Utils")
-    gstr_1_ui.config(padx=100, pady=80)
-
-    main_title = tk.Label(
-        master=gstr_1_ui,
-        text="GSTR 1 Utility",
-        font=("Courier new", 23, "bold"),
-        pady=40,
-    )
-    gstr_1_ui.focus_force()
-    main_title.grid(row=0, column=0, columnspan=4)
-
-    app_generation_mode_label = tk.Label(gstr_1_ui, text="Select App Working Mode")
-    app_generation_mode_label.grid(row=1, column=0, columnspan=4)
-    app_generation_mode_var = tk.StringVar(gstr_1_ui, "single")
-    app_generation_modes = {
-        "Single": {"value": "single", "row": 2, "column": 0, "span": 2},
-        "Directory": {"value": "directory", "row": 2, "column": 2, "span": 2},
-    }
-    for (modes, mode_vals) in app_generation_modes.items():
-        tk.Radiobutton(
-            gstr_1_ui,
-            text=modes,
-            variable=app_generation_mode_var,
-            value=mode_vals["value"],
-            command=set_app_generation_mode,
-        ).grid(
-            row=mode_vals["row"],
-            column=mode_vals["column"],
-            columnspan=mode_vals["span"],
-        )
-
-    app_processing_mode_label = tk.Label(gstr_1_ui, text="Select File Processing Mode")
-    app_processing_mode_var = tk.StringVar(gstr_1_ui, "excel")
-    app_processing_mode_label.grid(row=3, column=0, columnspan=4)
-    app_processing_modes = {
-        "Excel Only": {
-            "value": "excel",
-            "row": 4,
-            "column": 0,
+    gstr_1_ui = gst_utils_ui(
+        window_title="GSTR 1 Utils",
+        title="GSTR 1 Utility",
+        commands={
+            "app_generation": set_app_generation_mode,
+            "app_processing": set_app_processing_mode,
         },
-        "JSON Only": {
-            "value": "json",
-            "row": 4,
-            "column": 1,
-        },
-        "Zipped": {
-            "value": "zipped",
-            "row": 4,
-            "column": 2,
-        },
-        "Excel with JSON": {"value": "excel-json", "row": 4, "column": 3},
-    }
-
-    for (modes, mode_vals) in app_processing_modes.items():
-        tk.Radiobutton(
-            gstr_1_ui,
-            text=modes,
-            variable=app_processing_mode_var,
-            value=mode_vals["value"],
-            command=set_app_processing_mode,
-        ).grid(row=mode_vals["row"], column=mode_vals["column"])
-
-    source_dir_label = tk.Label(gstr_1_ui, text=" ")
-    source_dir_label.grid(row=5, column=0, columnspan=4)
-    final_dir_label = tk.Label(gstr_1_ui, text=" ")
-    final_dir_label.grid(row=6, column=0, columnspan=4)
-
-    start_gstr_1_process_button = tk.Button(
-        gstr_1_ui, text="Start Processing", command=start_gstr_1_process
+        start_button=start_gstr_1_process,
     )
-    start_gstr_1_process_button.grid(row=7, column=0, columnspan=4)
 
-    app_status_text = tk.Label(
-        gstr_1_ui,
-        text="Status - Ready to Process",
-        padx=10,
-        pady=10,
-    )
-    app_status_text.grid(row=8, column=0, columnspan=4)
-
-    developer_label_head = tk.Label(text="Developed by")
-    developer_label_head.grid(row=9, column=0, columnspan=4)
-
-    developer_label_value = tk.Label(text="Shan.tk", font=("Courier New", 12, "bold"))
-    developer_label_value.grid(row=10, column=0, columnspan=4)
-
-    gstr_1_ui.mainloop()
+    gstr_1_ui.initialize_engine()
 
 
 gstr_1_ui = None
@@ -504,18 +434,13 @@ basic_data = {}
 
 app_mode = "excel"
 app_generation_mode = "single"
-app_generation_mode_var = None
-app_processing_mode_var = None
-
-app_status_text = None
 
 create_file_dir_modes = ["excel-json", "zipped", "json"]
 create_excel_dir_modes = ["excel-json", "zipped", "excel"]
-
-source_dir_label = None
-final_dir_label = None
 
 work_book = None
 
 file_name = ""
 file_directory = ""
+
+start_window_app()
