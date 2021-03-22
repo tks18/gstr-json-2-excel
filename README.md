@@ -1,4 +1,4 @@
-# GSTR 1 Utility
+# GSTR 1/2A Utility
 
 ## by Shan.tk
 
