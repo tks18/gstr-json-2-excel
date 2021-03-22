@@ -1,3 +1,4 @@
+from os import close
 import gstr_1 as gstr_1_utils
 import gstr_2 as gstr_2_utils
 
@@ -17,6 +18,7 @@ def main_ui_window():
     main_ui.title("GSTR Utils by Shan.tk")
     main_ui.config(padx=50, pady=50, bg=BG)
 
+    main_ui.focus_force()
     main_ui_canvas = Canvas(highlightthickness=0, height=200, width=200, background=BG)
     main_ui_canvas.create_image(100, 100, image=icon)
     main_ui_canvas.grid(row=0, column=0, columnspan=2)
@@ -60,18 +62,18 @@ def open_gstr_1_window():
     global main_ui
 
     main_ui.destroy()
-    gstr_1_utils.start_window_app()
+    close_app = gstr_1_utils.start_window_app()
+    if not close_app:
+        main_ui_window()
 
 
 def open_gstr_2_window():
     global main_ui
 
     main_ui.destroy()
-    gstr_2_utils.start_window_app()
-
-
-def restart_window():
-    main_ui_window()
+    close_app = gstr_2_utils.start_window_app()
+    if not close_app:
+        main_ui_window()
 
 
 main_ui = None

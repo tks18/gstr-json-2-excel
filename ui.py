@@ -12,9 +12,16 @@ class gst_utils_ui:
         self.ui.config(padx=40, pady=40, bg=BG)
         self.icon = tk.PhotoImage(file=resource_path("images/logo.png"))
         self.ui.iconphoto(False, self.icon)
-        self.canvas = tk.Canvas(height=200, width=200, highlightthickness=0, bg=BG)
+
+        self.menuButton = tk.Button(
+            self.ui, text="Menu", command=self.close_window, fg=FG, bg=BG
+        )
+        self.menuButton.grid(row=0, column=0)
+        self.canvas = tk.Canvas(
+            self.ui, height=200, width=200, highlightthickness=0, bg=BG
+        )
         self.canvas.create_image(100, 100, image=self.icon)
-        self.canvas.grid(row=0, column=0, columnspan=4)
+        self.canvas.grid(row=1, column=0, columnspan=4)
         self.main_title = tk.Label(
             master=self.ui,
             text=title,
@@ -24,16 +31,16 @@ class gst_utils_ui:
             fg=FG,
         )
         self.ui.focus_force()
-        self.main_title.grid(row=1, column=0, columnspan=4)
+        self.main_title.grid(row=2, column=0, columnspan=4)
 
         self.app_generation_mode_label = tk.Label(
             self.ui, text="Select App Working Mode", bg=BG, fg=FG
         )
-        self.app_generation_mode_label.grid(row=2, column=0, columnspan=4)
+        self.app_generation_mode_label.grid(row=3, column=0, columnspan=4)
         self.app_generation_mode_var = tk.StringVar(self.ui, "single")
         app_generation_modes = {
-            "Single": {"value": "single", "row": 3, "column": 0, "span": 2},
-            "Directory": {"value": "directory", "row": 3, "column": 2, "span": 2},
+            "Single": {"value": "single", "row": 4, "column": 0, "span": 2},
+            "Directory": {"value": "directory", "row": 4, "column": 2, "span": 2},
         }
         for (modes, mode_vals) in app_generation_modes.items():
             tk.Radiobutton(
@@ -55,24 +62,24 @@ class gst_utils_ui:
             self.ui, text="Select File Processing Mode", bg=BG, fg=FG
         )
         self.app_processing_mode_var = tk.StringVar(self.ui, "excel")
-        self.app_processing_mode_label.grid(row=4, column=0, columnspan=4)
+        self.app_processing_mode_label.grid(row=5, column=0, columnspan=4)
         app_processing_modes = {
             "Excel Only": {
                 "value": "excel",
-                "row": 5,
+                "row": 6,
                 "column": 0,
             },
             "JSON Only": {
                 "value": "json",
-                "row": 5,
+                "row": 6,
                 "column": 1,
             },
             "Zipped": {
                 "value": "zipped",
-                "row": 5,
+                "row": 6,
                 "column": 2,
             },
-            "Excel with JSON": {"value": "excel-json", "row": 5, "column": 3},
+            "Excel with JSON": {"value": "excel-json", "row": 6, "column": 3},
         }
 
         for (modes, mode_vals) in app_processing_modes.items():
@@ -88,14 +95,14 @@ class gst_utils_ui:
             ).grid(row=mode_vals["row"], column=mode_vals["column"])
 
         self.source_dir_label = tk.Label(self.ui, text=" ", bg=BG, fg=FG)
-        self.source_dir_label.grid(row=6, column=0, columnspan=4)
+        self.source_dir_label.grid(row=7, column=0, columnspan=4)
         self.final_dir_label = tk.Label(self.ui, text=" ", bg=BG, fg=FG)
-        self.final_dir_label.grid(row=7, column=0, columnspan=4)
+        self.final_dir_label.grid(row=8, column=0, columnspan=4)
 
         self.start_gstr_1_process_button = tk.Button(
             self.ui, text="Start Processing", command=start_button, bg=BG, fg=FG
         )
-        self.start_gstr_1_process_button.grid(row=8, column=0, columnspan=4)
+        self.start_gstr_1_process_button.grid(row=9, column=0, columnspan=4)
 
         self.app_status_text = tk.Label(
             self.ui,
@@ -105,15 +112,15 @@ class gst_utils_ui:
             padx=5,
             pady=5,
         )
-        self.app_status_text.grid(row=9, column=0, columnspan=4)
+        self.app_status_text.grid(row=10, column=0, columnspan=4)
 
-        self.developer_label_head = tk.Label(text="Developed by", bg=BG, fg=FG)
-        self.developer_label_head.grid(row=10, column=0, columnspan=4)
+        self.developer_label_head = tk.Label(self.ui, text="Developed by", bg=BG, fg=FG)
+        self.developer_label_head.grid(row=11, column=0, columnspan=4)
 
         self.developer_label_value = tk.Label(
-            text="Shan.tk", font=("Courier New", 12, "bold"), bg=BG, fg=FG
+            self.ui, text="Shan.tk", font=("Courier New", 12, "bold"), bg=BG, fg=FG
         )
-        self.developer_label_value.grid(row=11, column=0, columnspan=4)
+        self.developer_label_value.grid(row=12, column=0, columnspan=4)
 
     def close_window(self):
         self.ui.destroy()

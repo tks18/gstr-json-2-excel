@@ -323,8 +323,15 @@ def set_app_processing_mode():
     app_mode = gstr_2_ui.app_processing_mode_var.get()
 
 
+def initiate_force_close():
+    global gstr_2_ui, force_close
+
+    gstr_2_ui.close_window()
+    force_close = True
+
+
 def start_window_app():
-    global gstr_2_ui
+    global gstr_2_ui, force_close
 
     gstr_2_ui = gst_utils_ui(
         window_title="GSTR 2A Utils",
@@ -336,12 +343,17 @@ def start_window_app():
         start_button=start_gstr_2_process,
     )
 
+    gstr_2_ui.ui.protocol("WM_DELETE_WINDOW", initiate_force_close)
+
     gstr_2_ui.initialize_engine()
+
+    return force_close
 
 
 gstr_2_ui = None
 
 basic_data = {}
+force_close = False
 
 app_mode = "excel"
 app_generation_mode = "single"
