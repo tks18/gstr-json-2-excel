@@ -6,6 +6,10 @@ Open Source GSTR 1/GSTR 2A JSON to Excel utility based on Python. Useful for Aud
 
 ### Download Latest Verion - [V2.1.0](https://github.com/tks18/gstr-json-2-excel/releases/download/v2.1.0-stable/gstr_utils-v2.1.0-stable_build.exe)
 
+### Screenshots
+
+![https://i.ibb.co/yN8GWRv/main-home.jpg](https://i.ibb.co/yN8GWRv/main-home.jpg)![https://i.ibb.co/n13zFC9/gstr1.jpg](https://i.ibb.co/n13zFC9/gstr1.jpg)
+ 
 ### Currently Working Methods for Both GSTR 1/2A
 
 * B2B Invoices
