@@ -27,7 +27,19 @@ def write_basic_data(path_to_json):
         "cur_gt": "Current GT",
         "fil_dt": "Filing Date",
     }
-    not_required_keys = ["b2b", "cdnr", "exp", "b2cs", "b2cl", "b2ba", "hsn","cdnur","b2csa"]
+    not_required_keys = [
+        "b2b",
+        "cdnr",
+        "exp",
+        "b2cs",
+        "b2cl",
+        "b2ba",
+        "hsn",
+        "cdnur",
+        "b2csa",
+        "cdnra",
+        "expa"
+    ]
     basic_data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
         if key in basic_data:
