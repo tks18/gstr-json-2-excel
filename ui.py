@@ -94,9 +94,11 @@ class gst_utils_ui:
                 command=commands["app_processing"],
             ).grid(row=mode_vals["row"], column=mode_vals["column"])
 
-        self.source_dir_label = tk.Label(self.ui, text=" ", bg=BG, fg=FG)
+        self.source_dir_label = tk.Label(
+            self.ui, text=" ", bg=BG, fg=FG, wraplength=450
+        )
         self.source_dir_label.grid(row=7, column=0, columnspan=4)
-        self.final_dir_label = tk.Label(self.ui, text=" ", bg=BG, fg=FG)
+        self.final_dir_label = tk.Label(self.ui, text=" ", bg=BG, fg=FG, wraplength=450)
         self.final_dir_label.grid(row=8, column=0, columnspan=4)
 
         self.start_gstr_1_process_button = tk.Button(

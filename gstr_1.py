@@ -38,7 +38,8 @@ def write_basic_data(path_to_json):
         "cdnur",
         "b2csa",
         "cdnra",
-        "expa"
+        "expa",
+        "doc_issue"
     ]
     basic_data = get_json_sales_data(path_to_json)
     for key in not_required_keys:

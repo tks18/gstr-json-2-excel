@@ -23,7 +23,7 @@ def write_basic_data(path_to_json):
         "gstin": "GSTIN",
         "fp": "Month",
     }
-    not_required_keys = ["b2b", "cdn", "b2ba", "cdnur","b2csa","cdnra","expa"]
+    not_required_keys = ["b2b", "cdn", "b2ba", "cdnur","b2csa","cdnra","expa","doc_issue"]
     basic_data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
         if key in basic_data:

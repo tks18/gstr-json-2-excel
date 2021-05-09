@@ -78,4 +78,5 @@ def open_gstr_2_window():
 
 main_ui = None
 
-main_ui_window()
+if __name__ == "__main__":
+    main_ui_window()
