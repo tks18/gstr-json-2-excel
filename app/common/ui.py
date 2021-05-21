@@ -1,5 +1,5 @@
 import tkinter as tk
-from helpers import resource_path
+from app.common.helpers import resource_path
 
 BG = "#121212"
 FG = "#FFFFFF"

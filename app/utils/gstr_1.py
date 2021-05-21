@@ -5,8 +5,8 @@ from tkinter import messagebox
 from openpyxl import Workbook
 
 # Other Imports
-from ui import gst_utils_ui
-from helpers import (
+from app.common.ui import gst_utils_ui
+from app.common.helpers import (
     get_user_json_directory,
     get_json_sales_data,
     write_basic_data_sheet,
@@ -15,18 +15,13 @@ from helpers import (
     make_archive,
 )
 
+# heading map imports
+from app.common.heading_maps.gstr_1 import *
+
 
 def write_basic_data(path_to_json):
     global work_book, basic_data, app_mode, create_excel_dir_modes
 
-    basic_data_heading_map = {
-        "gstin": "GSTIN",
-        "fp": "Month",
-        "filing_typ": "Filing Mode",
-        "gt": "GT",
-        "cur_gt": "Current GT",
-        "fil_dt": "Filing Date",
-    }
     not_required_keys = [
         "b2b",
         "cdnr",
@@ -39,7 +34,7 @@ def write_basic_data(path_to_json):
         "b2csa",
         "cdnra",
         "expa",
-        "doc_issue"
+        "doc_issue",
     ]
     basic_data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
@@ -61,27 +56,6 @@ def write_b2b_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2b_heading_map = {
-        "chksum": "Check Sum",
-        "itms_0_itm_det_iamt": "IGST",
-        "rchrg": "Reverse Charge",
-        "itms_0_itm_det_csamt": "Cess",
-        "idt": "Invoice Date",
-        "ctin": "GSTIN",
-        "inv_typ": "Invoice Type",
-        "itms_0_itm_det_txval": "Taxable Value",
-        "cflag": "C-Flag",
-        "itms_0_itm_det_camt": "CGST",
-        "itms_0_itm_det_rt": "Rate",
-        "updby": "Updated by",
-        "cfs": "CFS",
-        "flag": "Flag",
-        "inum": "Invoice No.",
-        "itms_0_itm_det_samt": "SGST",
-        "pos": "Place of Sale",
-        "itms_0_num": "Rate Number",
-        "val": "Invoice Value",
-    }
     b2b_heading_list = [heading for heading in b2b_heading_map]
 
     sales_data = get_json_sales_data(path_to_json)
@@ -109,27 +83,6 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2b_credit_notes_headings_map = {
-        "itms_0_itm_det_iamt": "IGST",
-        "updby": "Updated by",
-        "cfs": "CFS",
-        "nt_num": "Credit Note No",
-        "itms_0_itm_det_samt": "SGST",
-        "nt_dt": "Credit Note Date",
-        "idt": "Invoice Date",
-        "itms_0_itm_det_rt": "Rate",
-        "val": "Invoice Value",
-        "flag": "Flag",
-        "p_gst": "P GST",
-        "itms_0_itm_det_camt": "CGST",
-        "ntty": "Credit Note Type",
-        "ctin": "GSTIN",
-        "itms_0_num": "Rate Number",
-        "cflag": "C Flag",
-        "itms_0_itm_det_txval": "Taxable Value",
-        "inum": "Original Invoice Number",
-        "chksum": "Check Sum",
-    }
 
     b2b_credit_notes_headings_list = [
         heading for heading in b2b_credit_notes_headings_map
@@ -160,18 +113,6 @@ def write_b2cs_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2cs_sales_heading_map = {
-        "samt": "SGST",
-        "camt": "CGST",
-        "typ": "Type",
-        "flag": "Flag",
-        "sply_ty": "Supply Type",
-        "chksum": "Check Sum",
-        "iamt": "IGST",
-        "txval": "Taxable Value",
-        "rt": "Rate",
-        "pos": "Place of Supply",
-    }
 
     b2cs_sales_heading_list = [heading for heading in b2cs_sales_heading_map]
 
@@ -201,18 +142,7 @@ def write_export_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    export_headings_map = {
-        "itms_0_csamt": "Cess",
-        "itms_0_iamt": "IGST",
-        "val": "Invoice Value",
-        "itms_0_rt": "Rate",
-        "idt": "Invoice Date",
-        "exp_typ": "Exports Type",
-        "flag": "Flag",
-        "chksum": "Check Sum",
-        "itms_0_txval": "Taxable Value",
-        "inum": "Invoice Number",
-    }
+
     export_headings_list = [heading for heading in export_headings_map]
 
     sales_data = get_json_sales_data(path_to_json)
@@ -241,27 +171,6 @@ def write_b2ba_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2ba_heading_map = {
-        "idt": "Invoice Date",
-        "inv_typ": "Invoice Type",
-        "itms_0_itm_det_rt": "Rate",
-        "itms_0_itm_det_camt": "CGST",
-        "pos": "Place of Sale",
-        "val": "Invoice Value",
-        "updby": "Updated by",
-        "itms_0_itm_det_txval": "Taxable Value",
-        "cflag": "C Flag",
-        "itms_0_num": "Rate Number",
-        "oidt": "Old Invoice Date",
-        "ctin": "GSTIN",
-        "cfs": "CFS",
-        "rchrg": "Reverse Charge",
-        "itms_0_itm_det_samt": "SGST",
-        "inum": "Invoice Number",
-        "oinum": "Old Invoice Number",
-        "flag": "Flag",
-        "chksum": "Check Sum",
-    }
 
     b2ba_heading_list = [heading for heading in b2ba_heading_map]
     sales_data = get_json_sales_data(path_to_json)
@@ -324,7 +233,7 @@ def write_all_invoices(
 
 
 def start_gstr_1_process():
-    global basic_data, app_mode, app_generation_mode
+    global basic_data, app_mode, app_generation_mode, force_close
     global create_file_dir_modes, create_excel_dir_modes
     global work_book, file_name, file_directory
 
@@ -404,6 +313,7 @@ def start_gstr_1_process():
                 gstr_1_ui.source_dir_label.config(text=" ")
                 gstr_1_ui.final_dir_label.config(text=" ")
             else:
+                force_close = True
                 gstr_1_ui.close_window()
 
         else:

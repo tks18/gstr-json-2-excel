@@ -1,9 +1,8 @@
-from os import close
-import gstr_1 as gstr_1_utils
-import gstr_2 as gstr_2_utils
+import app.utils.gstr_1 as gstr_1_utils
+import app.utils.gstr_2 as gstr_2_utils
 
 from tkinter import *
-from helpers import resource_path
+from app.common.helpers import resource_path
 
 BG = "#121212"
 FG = "#FFFFFF"

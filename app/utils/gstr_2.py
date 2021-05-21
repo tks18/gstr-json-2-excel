@@ -5,8 +5,8 @@ from tkinter import messagebox
 from openpyxl import Workbook
 
 # Other Imports
-from ui import gst_utils_ui
-from helpers import (
+from app.common.ui import gst_utils_ui
+from app.common.helpers import (
     get_user_json_directory,
     get_json_sales_data,
     write_basic_data_sheet,
@@ -15,15 +15,23 @@ from helpers import (
     make_archive,
 )
 
+# heading map imports
+from app.common.heading_maps.gstr_2 import *
+
 
 def write_basic_data(path_to_json):
     global work_book, basic_data, app_mode, create_excel_dir_modes
 
-    basic_data_heading_map = {
-        "gstin": "GSTIN",
-        "fp": "Month",
-    }
-    not_required_keys = ["b2b", "cdn", "b2ba", "cdnur","b2csa","cdnra","expa","doc_issue"]
+    not_required_keys = [
+        "b2b",
+        "cdn",
+        "b2ba",
+        "cdnur",
+        "b2csa",
+        "cdnra",
+        "expa",
+        "doc_issue",
+    ]
     basic_data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
         if key in basic_data:
@@ -44,28 +52,7 @@ def write_b2b_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2b_heading_map = {
-        "inum": "Invoice Number",
-        "pos": "Place of Sale",
-        "chksum": "Check Sum",
-        "itms_0_itm_det_iamt": "IGST",
-        "inv_typ": "Invoice Type",
-        "itms_0_itm_det_samt": "SGST",
-        "itms_0_itm_det_txval": "Taxable Value",
-        "ctin": "GSTIN",
-        "cfs3b": "GSTR 3B",
-        "rchrg": "Reverse Charge",
-        "itms_0_num": "Rate Number",
-        "val": "Invoice Value",
-        "itms_0_itm_det_camt": "CGST",
-        "flprdr1": "GSTR 1 Filing Period",
-        "itms_0_itm_det_csamt": "Cess",
-        "fldtr1": "GSTR 1 Filing Date",
-        "itms_0_itm_det_rt": "Rate",
-        "idt": "Invoice Date",
-        "cfs": "CFS",
-        "dtcancel": "Date of Cancel(if)",
-    }
+    
     b2b_heading_list = [heading for heading in b2b_heading_map]
 
     sales_data = get_json_sales_data(path_to_json)
@@ -93,27 +80,6 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2b_credit_notes_headings_map = {
-        "inum": "Invoice Number",
-        "nt_dt": "Credit Note Date",
-        "itms_0_itm_det_camt": "CGST",
-        "chksum": "Check Sum",
-        "fldtr1": "Filing Date",
-        "nt_num": "Credit Note Number",
-        "val": "Invoice Value",
-        "itms_0_num": "Rate Number",
-        "idt": "Invoice Date",
-        "ntty": "Credit Note Type",
-        "itms_0_itm_det_iamt": "IGST",
-        "itms_0_itm_det_samt": "SGST",
-        "cfs3b": "GSTR 3B",
-        "flprdr1": "Filing Period",
-        "p_gst": "P GST",
-        "itms_0_itm_det_txval": "Taxable Value",
-        "cfs": "CFS",
-        "itms_0_itm_det_rt": "Rate",
-        "ctin": "GSTIN",
-    }
 
     b2b_credit_notes_headings_list = [
         heading for heading in b2b_credit_notes_headings_map
@@ -144,31 +110,6 @@ def write_b2ba_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    b2ba_heading_map = {
-        "itms_0_itm_det_csamt": "Cess",
-        "idt": "Invoice Date",
-        "itms_0_itm_det_camt": "CGST",
-        "chksum": "Check Sum",
-        "inv_typ": "Invoice Type",
-        "oinum": "Original Invoice Number",
-        "fldtr1": "GSTR 1 Filing Date",
-        "rchrg": "Reverse Charge",
-        "itms_0_num": "Rate Number",
-        "itms_0_itm_det_txval": "Taxable Value",
-        "cfs3b": "GSTR 3B",
-        "itms_0_itm_det_iamt": "IGST",
-        "ctin": "GSTIN",
-        "val": "Invoice Value",
-        "inum": "Invoice Number",
-        "aspd": "Original Invoice Period",
-        "itms_0_itm_det_rt": "Rate",
-        "cfs": "CFS",
-        "flprdr1": "GSTR 1 Filing Period",
-        "oidt": "Old Invoice Date",
-        "pos": "Place of Sale",
-        "atyp": "Original Invoice Type",
-        "itms_0_itm_det_samt": "SGST",
-    }
 
     b2ba_heading_list = [heading for heading in b2ba_heading_map]
     sales_data = get_json_sales_data(path_to_json)
