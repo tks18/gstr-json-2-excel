@@ -5,7 +5,7 @@ from tkinter import messagebox
 from openpyxl import Workbook
 
 # Other Imports
-from app.common.ui import gst_utils_ui
+from app.common.ui.utils import gst_utils_ui
 from app.common.helpers import (
     get_user_json_directory,
     get_json_sales_data,
@@ -52,7 +52,7 @@ def write_b2b_invoices(path_to_json, destination):
     global work_book, file_name, create_file_dir_modes, app_mode, create_excel_dir_modes
 
     invoice_list = []
-    
+
     b2b_heading_list = [heading for heading in b2b_heading_map]
 
     sales_data = get_json_sales_data(path_to_json)
@@ -226,15 +226,17 @@ def start_gstr_2_process():
                         ),
                     )
 
-                    if (
-                        app_mode in ["json", "excel-json"]
-                        and app_generation_mode == "single"
-                    ):
-                        startfile(
-                            user_input_dirs["final_dir"] + "/" + file_name, "open"
-                        )
-                    else:
-                        startfile(user_input_dirs["final_dir"], "open")
+                    open_final_dir = gstr_2_ui.open_final_dir_var.get()
+                    if open_final_dir:
+                        if (
+                            app_mode in ["json", "excel-json"]
+                            and app_generation_mode == "single"
+                        ):
+                            startfile(
+                                user_input_dirs["final_dir"] + "/" + file_name, "open"
+                            )
+                        else:
+                            startfile(user_input_dirs["final_dir"], "open")
 
             restart_app_input = messagebox.askyesno(
                 title="Restart App",

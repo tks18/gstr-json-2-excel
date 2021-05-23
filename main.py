@@ -1,5 +1,6 @@
 import app.utils.gstr_1 as gstr_1_utils
 import app.utils.gstr_2 as gstr_2_utils
+import app.reco.gstr_9c.main as gstr_9c_utils
 
 from tkinter import *
 from app.common.helpers import resource_path
@@ -31,7 +32,7 @@ def main_ui_window():
     )
     main_title.grid(row=1, column=0, columnspan=2)
 
-    ui_buttons = [
+    utility_buttons = [
         {
             "title": "GSTR 1",
             "command": open_gstr_1_window,
@@ -41,18 +42,26 @@ def main_ui_window():
         {"title": "GSTR 2", "command": open_gstr_2_window, "row": 3, "column": 1},
     ]
 
-    utility_label = Label(
-        text="Select the utility which you want to open:", bg=BG, fg=FG
-    )
+    utility_label = Label(text="General Utilities", bg=BG, fg=FG)
     utility_label.grid(row=2, column=0, columnspan=2)
-    for btn in ui_buttons:
+    for btn in utility_buttons:
         new_btn = Button(text=btn["title"], bg=BG, fg=FG, command=btn["command"])
-        new_btn.grid(row=btn["row"], column=btn["column"])
+        new_btn.grid(row=btn["row"], column=btn["column"], pady=10)
+
+    reco_buttons = [
+        {"title": "GSTR 9C", "command": open_gstr_9c_window, "row": 5, "column": 0}
+    ]
+
+    reco_label = Label(text="Reconciliation Utilities", bg=BG, fg=FG)
+    reco_label.grid(row=4, column=0, columnspan=2)
+    for btn in reco_buttons:
+        new_btn = Button(text=btn["title"], bg=BG, fg=FG, command=btn["command"])
+        new_btn.grid(row=btn["row"], column=btn["column"], pady=10)
 
     developer_label = Label(
         text="Shan.tk", font=("Courier New", 10, "bold"), bg=BG, fg=FG, padx=10, pady=30
     )
-    developer_label.grid(row=4, column=0, columnspan=2)
+    developer_label.grid(row=6, column=0, columnspan=2)
 
     main_ui.mainloop()
 
@@ -73,6 +82,13 @@ def open_gstr_2_window():
     close_app = gstr_2_utils.start_window_app()
     if not close_app:
         main_ui_window()
+
+
+def open_gstr_9c_window():
+    global main_ui
+
+    main_ui.destroy()
+    gstr_9c_utils.start_window_app()
 
 
 main_ui = None

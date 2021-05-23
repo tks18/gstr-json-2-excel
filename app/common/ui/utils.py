@@ -1,38 +1,12 @@
 import tkinter as tk
-from app.common.helpers import resource_path
+from app.common.ui.base import base_ui
 
-BG = "#121212"
-FG = "#FFFFFF"
+from app.common.ui.common import BG, FG
 
 
-class gst_utils_ui:
+class gst_utils_ui(base_ui):
     def __init__(self, window_title, title, commands, start_button):
-        self.ui = tk.Tk()
-        self.ui.title(window_title)
-        self.ui.config(padx=40, pady=40, bg=BG)
-        self.icon = tk.PhotoImage(file=resource_path("images/logo.png"))
-        self.ui.iconphoto(False, self.icon)
-
-        self.menuButton = tk.Button(
-            self.ui, text="Menu", command=self.close_window, fg=FG, bg=BG
-        )
-        self.menuButton.grid(row=0, column=0)
-        self.canvas = tk.Canvas(
-            self.ui, height=200, width=200, highlightthickness=0, bg=BG
-        )
-        self.canvas.create_image(100, 100, image=self.icon)
-        self.canvas.grid(row=1, column=0, columnspan=4)
-        self.main_title = tk.Label(
-            master=self.ui,
-            text=title,
-            font=("Courier new", 23, "bold"),
-            pady=40,
-            bg=BG,
-            fg=FG,
-        )
-        self.ui.focus_force()
-        self.main_title.grid(row=2, column=0, columnspan=4)
-
+        super(gst_utils_ui, self).__init__(window_title, title)
         self.app_generation_mode_label = tk.Label(
             self.ui, text="Select App Working Mode", bg=BG, fg=FG
         )
@@ -106,6 +80,22 @@ class gst_utils_ui:
         )
         self.start_gstr_1_process_button.grid(row=9, column=0, columnspan=4)
 
+        self.open_final_dir_var = tk.BooleanVar(self.ui, True)
+        self.open_final_dir_checkButton = tk.Checkbutton(
+            self.ui,
+            text="Open the Destination Directory after Finish",
+            variable=self.open_final_dir_var,
+            fg=FG,
+            background=BG,
+            activebackground=BG,
+            activeforeground=FG,
+            highlightcolor=BG,
+            selectcolor=BG,
+            onvalue=True,
+            offvalue=False,
+        )
+        self.open_final_dir_checkButton.grid(row=10, column=0, columnspan=4)
+
         self.app_status_text = tk.Label(
             self.ui,
             text="Status - Ready to Process",
@@ -114,18 +104,12 @@ class gst_utils_ui:
             padx=5,
             pady=5,
         )
-        self.app_status_text.grid(row=10, column=0, columnspan=4)
+        self.app_status_text.grid(row=11, column=0, columnspan=4)
 
         self.developer_label_head = tk.Label(self.ui, text="Developed by", bg=BG, fg=FG)
-        self.developer_label_head.grid(row=11, column=0, columnspan=4)
+        self.developer_label_head.grid(row=12, column=0, columnspan=4)
 
         self.developer_label_value = tk.Label(
             self.ui, text="Shan.tk", font=("Courier New", 12, "bold"), bg=BG, fg=FG
         )
-        self.developer_label_value.grid(row=12, column=0, columnspan=4)
-
-    def close_window(self):
-        self.ui.destroy()
-
-    def initialize_engine(self):
-        self.ui.mainloop()
+        self.developer_label_value.grid(row=13, column=0, columnspan=4)
