@@ -9,6 +9,8 @@ import sys
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
 
+from app.common.threader import threader
+
 
 def resource_path(relative_path):
     try:
@@ -75,7 +77,7 @@ def get_user_json_directory(
             return {"ready_to_process": False, "source_dir": "", "final_dir": ""}
 
 
-def write_basic_data_sheet(work_sheet, basic_data, heading_map):
+def basic_data_function(work_sheet, basic_data, heading_map):
     work_sheet[f"{get_column_letter(4)}3"] = "Particulars"
     work_sheet[f"{get_column_letter(4)}3"].font = Font(bold=True)
     work_sheet[f"{get_column_letter(5)}3"] = "Value"
@@ -104,7 +106,7 @@ def write_basic_data_sheet(work_sheet, basic_data, heading_map):
         basic_data_column = start_column
 
 
-def generate_invoices_list(
+def gen_invoices_function(
     sales_data, sales_type, invoice_term, app_mode, create_file_dir_modes, file_name
 ):
     invoice_list = []
@@ -137,7 +139,7 @@ def generate_invoices_list(
     return invoice_list
 
 
-def write_invoices_to_excel(work_sheet, invoice_list, heading_map, heading_list):
+def invoice_to_excel_function(work_sheet, invoice_list, heading_map, heading_list):
     heading_ref_map = {}
     heading_column = 1
     heading_row = 1
@@ -174,6 +176,54 @@ def write_invoices_to_excel(work_sheet, invoice_list, heading_map, heading_list)
         invoice_row += 1
 
 
-def make_archive(path_to_files, file_name):
+def archive_function(path_to_files, file_name):
     shutil.make_archive(base_name=file_name, format="zip", root_dir=path_to_files)
     shutil.rmtree(path_to_files)
+
+
+def write_basic_data_sheet(work_sheet, basic_data, heading_map):
+    basic_data_thread = threader(
+        function=basic_data_function,
+        work_sheet=work_sheet,
+        basic_data=basic_data,
+        heading_map=heading_map,
+    )
+    basic_data_thread.start()
+    basic_data_thread.join()
+
+
+def generate_invoices_list(
+    sales_data, sales_type, invoice_term, app_mode, create_file_dir_modes, file_name
+):
+    gen_invoices_thread = threader(
+        function=gen_invoices_function,
+        sales_data=sales_data,
+        sales_type=sales_type,
+        invoice_term=invoice_term,
+        app_mode=app_mode,
+        create_file_dir_modes=create_file_dir_modes,
+        file_name=file_name,
+    )
+    gen_invoices_thread.start()
+    invoice_list = gen_invoices_thread.join()
+    return invoice_list
+
+
+def write_invoices_to_excel(work_sheet, invoice_list, heading_map, heading_list):
+    invoices_to_excel_thread = threader(
+        function=invoice_to_excel_function,
+        work_sheet=work_sheet,
+        invoice_list=invoice_list,
+        heading_map=heading_map,
+        heading_list=heading_list,
+    )
+    invoices_to_excel_thread.start()
+    invoices_to_excel_thread.join()
+
+
+def make_archive(path_to_files, file_name):
+    archive_thread = threader(
+        function=archive_function, path_to_files=path_to_files, file_name=file_name
+    )
+    archive_thread.start()
+    archive_thread.join()
