@@ -5,17 +5,19 @@ from app.common.ui.common import BG, FG
 
 
 class base_ui:
-    def __init__(self, window_title, title):
+    def __init__(self, window_title, title, menu):
         self.ui = tk.Tk()
         self.ui.title(window_title)
         self.ui.config(padx=40, pady=40, bg=BG)
         self.icon = tk.PhotoImage(file=resource_path("images/logo.png"))
         self.ui.iconphoto(False, self.icon)
 
-        self.menuButton = tk.Button(
-            self.ui, text="Menu", command=self.close_window, fg=FG, bg=BG
-        )
-        self.menuButton.grid(row=0, column=0)
+        if menu:
+            self.menuButton = tk.Button(
+                self.ui, text="Menu", command=self.close_window, fg=FG, bg=BG
+            )
+            self.menuButton.grid(row=0, column=0)
+
         self.canvas = tk.Canvas(
             self.ui, height=200, width=200, highlightthickness=0, bg=BG
         )
@@ -31,6 +33,16 @@ class base_ui:
         )
         self.ui.focus_force()
         self.main_title.grid(row=2, column=0, columnspan=4)
+
+        self.developer_label_head = tk.Label(
+            self.ui, text="Developed by", font=("Arial", 10, "bold"), bg=BG, fg=FG
+        )
+        self.developer_label_head.grid(row=20, column=0, columnspan=4, pady=(20, 0))
+
+        self.developer_label_value = tk.Label(
+            self.ui, text="Shan.tk", font=("Arial", 9, "bold"), bg=BG, fg=FG
+        )
+        self.developer_label_value.grid(row=21, column=0, columnspan=4, pady=(0, 0))
 
     def close_window(self):
         self.ui.destroy()

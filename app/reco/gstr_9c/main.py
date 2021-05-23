@@ -15,6 +15,9 @@ def start_window_app():
         window_title="GSTR 9C Reco Utility",
         title="GSTR 9C Utility",
         button_commands={"generate_csv_cmd": generate_csv},
+        menu=True,
     )
 
     gstr_9c_ui.initialize_engine()
+
+    return False

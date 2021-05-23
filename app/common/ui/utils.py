@@ -5,8 +5,8 @@ from app.common.ui.common import BG, FG
 
 
 class gst_utils_ui(base_ui):
-    def __init__(self, window_title, title, commands, start_button):
-        super(gst_utils_ui, self).__init__(window_title, title)
+    def __init__(self, window_title, title, commands, start_button, menu):
+        super(gst_utils_ui, self).__init__(window_title, title, menu)
         self.app_generation_mode_label = tk.Label(
             self.ui, text="Select App Working Mode", bg=BG, fg=FG
         )
@@ -105,11 +105,3 @@ class gst_utils_ui(base_ui):
             pady=5,
         )
         self.app_status_text.grid(row=11, column=0, columnspan=4)
-
-        self.developer_label_head = tk.Label(self.ui, text="Developed by", bg=BG, fg=FG)
-        self.developer_label_head.grid(row=12, column=0, columnspan=4)
-
-        self.developer_label_value = tk.Label(
-            self.ui, text="Shan.tk", font=("Courier New", 12, "bold"), bg=BG, fg=FG
-        )
-        self.developer_label_value.grid(row=13, column=0, columnspan=4)

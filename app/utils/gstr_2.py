@@ -284,6 +284,7 @@ def start_window_app():
             "app_processing": set_app_processing_mode,
         },
         start_button=start_gstr_2_process,
+        menu=True,
     )
 
     gstr_2_ui.ui.protocol("WM_DELETE_WINDOW", initiate_force_close)
