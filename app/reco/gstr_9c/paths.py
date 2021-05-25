@@ -3,7 +3,7 @@ from tkinter import filedialog
 
 
 def get_paths():
-    csv_write_path = filedialog.askdirectory(
-        title="Enter the Dir to which the Format CSV Has to be Saved"
+    init_proj_dir = filedialog.askdirectory(
+        title="Select a Directory to Initialize the 9C Project"
     )
-    return Path(csv_write_path.lower())
+    return Path(init_proj_dir.lower())

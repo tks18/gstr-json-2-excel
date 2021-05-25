@@ -1,6 +1,5 @@
 import csv
 from pathlib import Path
-from tkinter import messagebox
 
 
 def generate_csv_template(write_path):
@@ -90,7 +89,3 @@ def generate_csv_template(write_path):
         writer.writeheader()
         for items in sample_data:
             writer.writerow(items)
-        messagebox.showinfo(
-            title="Successfull",
-            message="Successfully Saved the CSV Template file to the Directory",
-        )
