@@ -2,3 +2,4 @@ et-xmlfile==1.1.0
 flatten-json==0.1.13
 openpyxl==3.0.7
 six==1.16.0
+toml==0.10.2

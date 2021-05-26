@@ -9,12 +9,17 @@ class gst_reco_ui(base_ui):
         super(gst_reco_ui, self).__init__(window_title, title, menu)
 
         for buttons in button_commands:
-            for (button_key, button_command) in buttons.items():
+            for (button_key, button_props) in buttons.items():
                 self.generate_csv_button = tk.Button(
                     self.ui,
                     text=button_key,
-                    command=button_command,
+                    command=button_props["command"],
                     fg=FG,
                     bg=BG,
                 )
-                self.generate_csv_button.grid(row=3, column=0, columnspan=4)
+                self.generate_csv_button.grid(
+                    row=button_props["row"],
+                    column=button_props["column"],
+                    columnspan=4,
+                    pady=5,
+                )
