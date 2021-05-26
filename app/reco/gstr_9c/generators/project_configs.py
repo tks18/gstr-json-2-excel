@@ -19,6 +19,16 @@ def generate_project_config(project_title, base_path, paths):
 
 
 def load_toml_config(path):
+    config = None
     with open(path, mode="r") as toml_config:
         config = toml.load(f=toml_config)
-        return config
+
+    project_uuid = config["unique-project-id"]
+    try:
+        uuid.UUID(project_uuid)
+    except ValueError:
+        config["valid"] = False
+    else:
+        config["valid"] = True
+
+    return config
