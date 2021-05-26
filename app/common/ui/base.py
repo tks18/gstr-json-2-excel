@@ -19,9 +19,9 @@ class base_ui:
             self.menuButton.grid(row=0, column=0)
 
         self.canvas = tk.Canvas(
-            self.ui, height=200, width=200, highlightthickness=0, bg=BG
+            self.ui, height=100, width=100, highlightthickness=0, bg=BG
         )
-        self.canvas.create_image(100, 100, image=self.icon)
+        self.canvas.create_image(50, 50, image=self.icon)
         self.canvas.grid(row=1, column=0, columnspan=4)
         self.main_title = tk.Label(
             master=self.ui,
