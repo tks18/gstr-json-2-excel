@@ -5,6 +5,7 @@ import uuid
 
 def generate_project_config(project_title, base_path, paths):
     config = {
+        "valid": True,
         "title": project_title,
         "type": "gstr-9c-project",
         "unique-project-id": str(uuid.uuid4()),
@@ -32,3 +33,22 @@ def load_toml_config(path):
         config["valid"] = True
 
     return config
+
+
+def update_config(config):
+    before_conf = None
+    with open(Path(config["config-path"]), mode="r") as toml_config:
+        before_conf = toml.load(f=toml_config)
+
+    project_uuid = before_conf["unique-project-id"]
+    try:
+        uuid.UUID(project_uuid)
+    except ValueError:
+        before_conf["valid"] = False
+        return before_conf
+    else:
+        before_conf["valid"] = True
+        new_config = config
+
+        with open(Path(before_conf["config-path"]), mode="w") as toml_config:
+            toml.dump(new_config, f=toml_config)
