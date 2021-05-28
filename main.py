@@ -4,9 +4,6 @@ import app.reco.gstr_9c.main as gstr_9c_utils
 
 from app.common.ui.main_ui import main_window
 
-BG = "#121212"
-FG = "#FFFFFF"
-
 
 def main_ui_window():
     global main_ui

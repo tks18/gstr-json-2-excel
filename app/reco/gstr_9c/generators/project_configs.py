@@ -3,11 +3,12 @@ from pathlib import Path
 import uuid
 
 
-def generate_project_config(project_title, base_path, paths):
+def generate_project_config(project_title, year, base_path, paths):
     config = {
         "valid": True,
         "title": project_title,
         "type": "gstr-9c-project",
+        "year": year,
         "unique-project-id": str(uuid.uuid4()),
         "config-path": str(Path(base_path, "project_config.toml")),
         "paths": {path["name"]: str(path["path"]) for path in paths},
@@ -52,3 +53,4 @@ def update_config(config):
 
         with open(Path(before_conf["config-path"]), mode="w") as toml_config:
             toml.dump(new_config, f=toml_config)
+            return new_config

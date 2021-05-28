@@ -4,22 +4,28 @@ from app.reco.gstr_9c.generators.project_configs import load_toml_config
 
 from app.common.ui.text_box_window import text_box_window
 from app.common.ui.reco import gst_reco_ui
+from app.common.ui.loader import loader_window
 
 
 def initialize_project():
     global project_config, gstr_9c_ui
 
     project_pop_window = text_box_window(
-        master=gstr_9c_ui.ui, title="Enter the Company Name", label="Company Name"
+        master=gstr_9c_ui.ui,
+        title="Enter the Company Name",
+        labels={"comp_name": "Company Name", "year": "Year"},
     )
     gstr_9c_ui.ui.wait_window(project_pop_window.ui)
 
     project_pop_result = project_pop_window.result
+
     gstr_9c_ui.ui.focus()
     if project_pop_result["success"]:
         paths = get_paths()
         project_config = initialize_new_project(
-            base_folder_path=paths, project_name=project_pop_result["text"]
+            base_folder_path=paths,
+            project_name=project_pop_result["comp_name"],
+            year=project_pop_result["year"],
         )
         gstr_9c_ui.project_init_status.config(text="Project: Initialized Successfully")
         gstr_9c_ui.hide_pre_load_buttons()
@@ -33,6 +39,13 @@ def load_saved_project():
     if project_config["valid"]:
         gstr_9c_ui.project_init_status.config(text="Project: Initialized Successfully")
         gstr_9c_ui.hide_pre_load_buttons()
+
+
+def start_loader():
+    global gstr_9c_ui
+
+    loader = loader_window(master=gstr_9c_ui.ui, title="Super", text="Super")
+    loader.start_animation()
 
 
 def reset_project_init():
@@ -66,6 +79,12 @@ def start_window_app():
             "title": "Reset Initialization",
             "command": reset_project_init,
             "row": 5,
+            "column": 0,
+        },
+        "start_button": {
+            "title": "Start Reco Process",
+            "command": start_loader,
+            "row": 6,
             "column": 0,
         },
     }

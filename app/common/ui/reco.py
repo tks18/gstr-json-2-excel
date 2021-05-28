@@ -54,9 +54,24 @@ class gst_reco_ui(base_ui):
         )
         self.reset_button.grid_remove()
 
+        self.start_button = tk.Button(
+            self.ui,
+            text=button_commands["start_button"]["title"],
+            command=button_commands["start_button"]["command"],
+            fg=FG,
+            bg=BG,
+        )
+        self.start_button.grid(
+            row=button_commands["start_button"]["row"],
+            column=button_commands["start_button"]["column"],
+            columnspan=maxcol,
+        )
+        self.start_button.grid_remove()
+
     def hide_pre_load_buttons(self):
         self.project_command_label.grid_remove()
         self.reset_button.grid()
+        self.start_button.grid()
         for buttons in self.button_commands["project_commands"]:
             for button_key in buttons:
                 self.project_command_buttons[button_key].grid_remove()
@@ -64,6 +79,7 @@ class gst_reco_ui(base_ui):
     def reset_initialization(self):
         self.project_command_label.grid()
         self.reset_button.grid_remove()
+        self.start_button.grid_remove()
         self.project_init_status.config(text="Project: Not Initialized")
         for buttons in self.button_commands["project_commands"]:
             for button_key in buttons:

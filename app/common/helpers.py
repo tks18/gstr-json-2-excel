@@ -107,7 +107,7 @@ def basic_data_function(work_sheet, basic_data, heading_map):
 
 
 def gen_invoices_function(
-    sales_data, sales_type, invoice_term, app_mode, create_file_dir_modes, file_name
+    sales_data, sales_type, invoice_term, generate_file, file_name
 ):
     invoice_list = []
     if not sales_type == "b2cs":
@@ -127,7 +127,7 @@ def gen_invoices_function(
                     flattened_inv = flatten(invoice)
                     invoice_list.append({**current_supplier, **flattened_inv})
 
-        if app_mode in create_file_dir_modes:
+        if generate_file:
             with open(file_name, mode="w") as b2b_sales_data:
                 json.dump(invoice_list, b2b_sales_data)
 
@@ -193,15 +193,14 @@ def write_basic_data_sheet(work_sheet, basic_data, heading_map):
 
 
 def generate_invoices_list(
-    sales_data, sales_type, invoice_term, app_mode, create_file_dir_modes, file_name
+    sales_data, sales_type, invoice_term, generate_file, file_name
 ):
     gen_invoices_thread = threader(
         function=gen_invoices_function,
         sales_data=sales_data,
         sales_type=sales_type,
         invoice_term=invoice_term,
-        app_mode=app_mode,
-        create_file_dir_modes=create_file_dir_modes,
+        generate_file=generate_file,
         file_name=file_name,
     )
     gen_invoices_thread.start()

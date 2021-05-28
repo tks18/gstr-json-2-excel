@@ -6,6 +6,7 @@ from openpyxl import Workbook
 
 # Other Imports
 from app.common.ui.utils import gst_utils_ui
+from app.common.ui.loader import loader_window
 from app.common.helpers import (
     get_user_json_directory,
     get_json_sales_data,
@@ -57,12 +58,13 @@ def write_b2b_invoices(path_to_json, destination):
 
     sales_data = get_json_sales_data(path_to_json)
     if "b2b" in sales_data:
+        generate_file = app_mode in create_file_dir_modes
+
         invoice_list = generate_invoices_list(
             sales_data=sales_data,
             sales_type="b2b",
             invoice_term="inv",
-            app_mode=app_mode,
-            create_file_dir_modes=create_file_dir_modes,
+            generate_file=generate_file,
             file_name=destination + "/" + file_name + "_GSTR_2A_b2b_sales.json",
         )
 
@@ -87,12 +89,13 @@ def write_b2b_credit_note_invoices(path_to_json, destination):
 
     sales_data = get_json_sales_data(path_to_json)
     if "cdn" in sales_data:
+        generate_file = app_mode in create_file_dir_modes
+
         invoice_list = generate_invoices_list(
             sales_data=sales_data,
             sales_type="cdn",
             invoice_term="nt",
-            app_mode=app_mode,
-            create_file_dir_modes=create_file_dir_modes,
+            generate_file=generate_file,
             file_name=destination + "/" + file_name + "_GSTR_2A_b2b_sales_returns.json",
         )
 
@@ -114,13 +117,13 @@ def write_b2ba_invoices(path_to_json, destination):
     b2ba_heading_list = [heading for heading in b2ba_heading_map]
     sales_data = get_json_sales_data(path_to_json)
     if "b2ba" in sales_data:
+        generate_file = app_mode in create_file_dir_modes
 
         invoice_list = generate_invoices_list(
             sales_data=sales_data,
             sales_type="b2ba",
             invoice_term="inv",
-            app_mode=app_mode,
-            create_file_dir_modes=create_file_dir_modes,
+            generate_file=generate_file,
             file_name=destination + "/" + file_name + "_GSTR_2A_b2ba_sales.json",
         )
 
@@ -164,9 +167,9 @@ def write_all_invoices(
 
 
 def start_gstr_2_process():
-    global basic_data, app_mode, app_generation_mode
+    global basic_data, app_mode, app_generation_mode, loader_sub_window
     global create_file_dir_modes, create_excel_dir_modes
-    global work_book, file_name, file_directory
+    global work_book, file_name, file_directory, gstr_2_ui
 
     user_input_dirs = get_user_json_directory(
         app_generation_mode=app_generation_mode,
@@ -215,7 +218,13 @@ def start_gstr_2_process():
                 except OSError:
                     gstr_2_ui.app_status_text.config(text="Status - Folder Error - ")
                 else:
-                    write_all_invoices(
+                    gstr_2_ui.ui.withdraw()
+
+                    loader_sub_window = loader_window(
+                        master=gstr_2_ui.ui,
+                        title="Processing Your Data",
+                        text="Please Wait while we Process the Data, Take a Sip of Coffee till we finish",
+                        function=write_all_invoices,
                         app_mode=app_mode,
                         create_excel_dir_modes=create_excel_dir_modes,
                         path_to_json=json_file,
@@ -225,6 +234,9 @@ def start_gstr_2_process():
                             user_input_dirs["final_dir"] + "/GSTR_2A_" + file_name
                         ),
                     )
+
+                    gstr_2_ui.ui.wait_window(loader_sub_window.ui)
+                    gstr_2_ui.ui.focus_force()
 
                     open_final_dir = gstr_2_ui.open_final_dir_var.get()
                     if open_final_dir:
@@ -237,6 +249,7 @@ def start_gstr_2_process():
                             )
                         else:
                             startfile(user_input_dirs["final_dir"], "open")
+            gstr_2_ui.ui.deiconify()
 
             restart_app_input = messagebox.askyesno(
                 title="Restart App",
@@ -295,6 +308,7 @@ def start_window_app():
 
 
 gstr_2_ui = None
+loader_sub_window = None
 
 basic_data = {}
 force_close = False
