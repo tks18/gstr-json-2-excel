@@ -10,10 +10,15 @@ from app.common.ui.loader import loader_window
 def initialize_project():
     global project_config, gstr_9c_ui
 
+    pre_config_questions = {
+        "comp_name": "Company Name",
+        "year": "Year",
+        "branch": "Branch Name (State)",
+    }
     project_pop_window = text_box_window(
         master=gstr_9c_ui.ui,
-        title="Enter the Company Name",
-        labels={"comp_name": "Company Name", "year": "Year"},
+        title="Enter the Details Required",
+        labels=pre_config_questions,
     )
     gstr_9c_ui.ui.wait_window(project_pop_window.ui)
 
@@ -25,7 +30,7 @@ def initialize_project():
         project_config = initialize_new_project(
             base_folder_path=paths,
             project_name=project_pop_result["comp_name"],
-            year=project_pop_result["year"],
+            other_details=project_pop_result,
         )
         gstr_9c_ui.project_init_status.config(text="Project: Initialized Successfully")
         gstr_9c_ui.hide_pre_load_buttons()
