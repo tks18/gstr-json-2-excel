@@ -107,7 +107,7 @@ def basic_data_function(work_sheet, basic_data, heading_map):
 
 
 def gen_invoices_function(
-    sales_data, sales_type, invoice_term, generate_file, file_name
+    sales_data, sales_type, invoice_term, gen_json, file_name
 ):
     invoice_list = []
     if not sales_type == "b2cs":
@@ -127,7 +127,7 @@ def gen_invoices_function(
                     flattened_inv = flatten(invoice)
                     invoice_list.append({**current_supplier, **flattened_inv})
 
-        if generate_file:
+        if gen_json:
             with open(file_name, mode="w") as b2b_sales_data:
                 json.dump(invoice_list, b2b_sales_data)
 
@@ -190,21 +190,25 @@ def write_basic_data_sheet(work_sheet, basic_data, heading_map):
     )
     basic_data_thread.start()
     basic_data_thread.join()
+    if basic_data_thread.error is not None:
+        raise basic_data_thread.error
 
 
 def generate_invoices_list(
-    sales_data, sales_type, invoice_term, generate_file, file_name
+    sales_data, sales_type, invoice_term, gen_json, file_name
 ):
     gen_invoices_thread = threader(
         function=gen_invoices_function,
         sales_data=sales_data,
         sales_type=sales_type,
         invoice_term=invoice_term,
-        generate_file=generate_file,
+        gen_json=gen_json,
         file_name=file_name,
     )
     gen_invoices_thread.start()
     invoice_list = gen_invoices_thread.join()
+    if gen_invoices_thread.error is not None:
+        raise gen_invoices_thread.error
     return invoice_list
 
 
@@ -218,6 +222,8 @@ def write_invoices_to_excel(work_sheet, invoice_list, heading_map, heading_list)
     )
     invoices_to_excel_thread.start()
     invoices_to_excel_thread.join()
+    if invoices_to_excel_thread.error is not None:
+        raise invoices_to_excel_thread.error
 
 
 def make_archive(path_to_files, file_name):
@@ -226,3 +232,5 @@ def make_archive(path_to_files, file_name):
     )
     archive_thread.start()
     archive_thread.join()
+    if archive_thread.error is not None:
+        raise archive_thread.error

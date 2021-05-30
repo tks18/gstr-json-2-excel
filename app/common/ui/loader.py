@@ -34,10 +34,14 @@ class loader_window:
         self.thread = threader(function=self.function, **self.function_args)
         self.thread.start()
         self.check_alive()
-    
+
     def check_alive(self):
-        
-        if self.thread.is_alive():
-            self.ui.after(200, self.check_alive)
-        else:
+        try:
+            thread_status = self.thread.get_status()
+
+            if thread_status["alive"] and thread_status["error"] is None:
+                self.ui.after(200, self.check_alive)
+            else:
+                self.ui.destroy()
+        except Exception:
             self.ui.destroy()
