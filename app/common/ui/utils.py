@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import ttk
+
 from app.common.ui.base import base_ui
 
 from app.common.ui.common import BG, FG
@@ -68,17 +70,75 @@ class gst_utils_ui(base_ui):
                 command=commands["app_processing"],
             ).grid(row=mode_vals["row"], column=mode_vals["column"])
 
-        self.source_dir_label = tk.Label(
-            self.ui, text=" ", bg=BG, fg=FG, wraplength=450
+        self.invoice_config_label = tk.Label(
+            self.ui, text="Select Invoices to Extract", fg=FG, bg=BG
         )
-        self.source_dir_label.grid(row=7, column=0, columnspan=4)
-        self.final_dir_label = tk.Label(self.ui, text=" ", bg=BG, fg=FG, wraplength=450)
-        self.final_dir_label.grid(row=8, column=0, columnspan=4)
+        self.invoice_config_label.grid(row=7, column=0, columnspan=2)
+
+        self.ui.option_add("*TCombobox*Listbox*Background", BG)
+        self.ui.option_add("*TCombobox*Listbox.foreground", FG)
+
+        self.invoice_config_var = tk.StringVar(
+            self.ui, commands["invoice_extract_options"]["default"]
+        )
+        drop_down_options = commands["invoice_extract_options"]["options"]
+        drop_down_tuple = tuple(
+            drop_down_options[option_key] for option_key in drop_down_options
+        )
+        self.invoice_config_drop_down = ttk.Combobox(
+            self.ui,
+            values=drop_down_tuple,
+            state="readonly",
+            textvariable=self.invoice_config_var,
+            width=25,
+            background=BG,
+            foreground=FG,
+        )
+        self.invoice_config_drop_down.grid(row=7, column=2, columnspan=2, pady=(3, 3))
+        self.invoice_config_drop_down.bind(
+            "<<ComboboxSelected>>", commands["invoice_extract_options"]["command"]
+        )
+
+        self.source_dir_label = tk.Label(
+            self.ui, text="Source: ", bg=BG, fg=FG, wraplength=450
+        )
+        self.source_dir_label.grid(row=8, column=0, columnspan=1, pady=(10, 0))
+        self.source_dir_entry = tk.Entry(
+            self.ui,
+            state="disabled",
+            width=40,
+            disabledbackground=BG,
+            background=BG,
+            disabledforeground=FG,
+            foreground=FG,
+            insertbackground=FG,
+            highlightcolor=FG,
+            highlightbackground=FG,
+        )
+        self.source_dir_entry.grid(row=8, column=1, columnspan=3, pady=(10, 0))
+
+        self.final_dir_label = tk.Label(
+            self.ui, text="Dest: ", bg=BG, fg=FG, wraplength=450
+        )
+        self.final_dir_label.grid(row=9, column=0, columnspan=1, pady=(0, 10))
+        self.final_dir_entry = tk.Entry(
+            self.ui,
+            state="disabled",
+            width=40,
+            disabledbackground=BG,
+            background=BG,
+            disabledforeground=FG,
+            foreground=FG,
+            insertbackground=FG,
+            highlightcolor=FG,
+            highlightbackground=FG,
+        )
+        self.final_dir_entry.grid(row=9, column=1, columnspan=3, pady=(0, 10))
 
         self.start_gstr_1_process_button = tk.Button(
             self.ui, text="Start Processing", command=start_button, bg=BG, fg=FG
         )
-        self.start_gstr_1_process_button.grid(row=9, column=0, columnspan=4)
+        self.start_gstr_1_process_button.grid(row=10, column=0, columnspan=4)
 
         self.open_final_dir_var = tk.BooleanVar(self.ui, True)
         self.open_final_dir_checkButton = tk.Checkbutton(
@@ -94,7 +154,7 @@ class gst_utils_ui(base_ui):
             onvalue=True,
             offvalue=False,
         )
-        self.open_final_dir_checkButton.grid(row=10, column=0, columnspan=4)
+        self.open_final_dir_checkButton.grid(row=11, column=0, columnspan=4)
 
         self.app_status_text = tk.Label(
             self.ui,
@@ -104,4 +164,4 @@ class gst_utils_ui(base_ui):
             padx=5,
             pady=5,
         )
-        self.app_status_text.grid(row=11, column=0, columnspan=4)
+        self.app_status_text.grid(row=12, column=0, columnspan=4)

@@ -1,7 +1,9 @@
 import tkinter as tk
+from tkinter import ttk
+
 from app.common.helpers import resource_path
 
-from app.common.ui.common import BG, FG
+from app.common.ui.common import BG, FG, TTK_THEME
 
 
 class base_ui:
@@ -34,6 +36,15 @@ class base_ui:
         )
         self.ui.focus_force()
         self.main_title.grid(row=2, column=0, columnspan=maxcol)
+
+        self.style = ttk.Style()
+
+        self.style.theme_create(
+            "gstr_theme",
+            parent="alt",
+            settings=TTK_THEME,
+        )
+        self.style.theme_use("gstr_theme")
 
         self.developer_label_head = tk.Label(
             self.ui, text="Developed by", font=("Arial", 10, "bold"), bg=BG, fg=FG

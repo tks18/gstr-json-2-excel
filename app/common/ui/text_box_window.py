@@ -27,7 +27,7 @@ class text_box_window:
                 fg=FG,
                 insertbackground=FG,
                 highlightcolor=FG,
-                highlightthickness=2,
+                highlightthickness=1,
                 highlightbackground=FG,
             )
             self.text_box[label_key].grid(

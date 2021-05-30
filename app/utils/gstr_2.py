@@ -22,30 +22,10 @@ from app.common.heading_maps.gstr_2 import *
 
 def generate_basic_data(path_to_json):
 
-    # not_required_keys = [
-    #     "b2b",
-    #     "cdnr",
-    #     "exp",
-    #     "b2cs",
-    #     "b2cl",
-    #     "b2ba",
-    #     "hsn",
-    #     "cdnur",
-    #     "b2csa",
-    #     "cdnra",
-    #     "expa",
-    #     "doc_issue",
-    # ]
-
     not_required_keys = [
         "b2b",
         "cdn",
         "b2ba",
-        "cdnur",
-        "b2csa",
-        "cdnra",
-        "expa",
-        "doc_issue",
     ]
     data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
@@ -67,109 +47,44 @@ def write_basic_data(work_book, basic_data):
     )
 
 
-def write_b2b_invoices(
+def invoices_writer(
     work_book,
+    sheet_name,
     file_name,
+    sales_data_list_name,
+    invoice_item_name,
     gen_json,
     gen_excel,
+    heading_map,
     path_to_json,
-    destination,
 ):
 
     invoice_list = []
-    b2b_heading_list = [heading for heading in b2b_heading_map]
+    heading_list = [heading for heading in heading_map]
 
     sales_data = get_json_sales_data(path_to_json)
-    if "b2b" in sales_data:
+    if sales_data_list_name in sales_data:
 
         invoice_list = generate_invoices_list(
             sales_data=sales_data,
-            sales_type="b2b",
-            invoice_term="inv",
+            sales_type=sales_data_list_name,
+            invoice_term=invoice_item_name,
             gen_json=gen_json,
-            file_name=destination + "/" + file_name + "_GSTR_2A_b2b_sales.json",
+            file_name=file_name,
         )
 
         if gen_excel:
-            b2b_sheet = work_book.create_sheet("B2B")
+            b2b_sheet = work_book.create_sheet(sheet_name)
             write_invoices_to_excel(
                 work_sheet=b2b_sheet,
                 invoice_list=invoice_list,
-                heading_map=b2b_heading_map,
-                heading_list=b2b_heading_list,
-            )
-
-
-def write_b2b_credit_note_invoices(
-    work_book,
-    file_name,
-    gen_json,
-    gen_excel,
-    path_to_json,
-    destination,
-):
-
-    invoice_list = []
-
-    b2b_credit_notes_headings_list = [
-        heading for heading in b2b_credit_notes_headings_map
-    ]
-
-    sales_data = get_json_sales_data(path_to_json)
-    if "cdn" in sales_data:
-
-        invoice_list = generate_invoices_list(
-            sales_data=sales_data,
-            sales_type="cdn",
-            invoice_term="nt",
-            gen_json=gen_json,
-            file_name=destination + "/" + file_name + "_GSTR_2A_b2b_sales_returns.json",
-        )
-
-        if gen_excel:
-            b2b_credit_notes_sheet = work_book.create_sheet(title="CDNR")
-            write_invoices_to_excel(
-                work_sheet=b2b_credit_notes_sheet,
-                invoice_list=invoice_list,
-                heading_map=b2b_credit_notes_headings_map,
-                heading_list=b2b_credit_notes_headings_list,
-            )
-
-
-def write_b2ba_invoices(
-    work_book,
-    file_name,
-    gen_json,
-    gen_excel,
-    path_to_json,
-    destination,
-):
-
-    invoice_list = []
-
-    b2ba_heading_list = [heading for heading in b2ba_heading_map]
-    sales_data = get_json_sales_data(path_to_json)
-    if "b2ba" in sales_data:
-
-        invoice_list = generate_invoices_list(
-            sales_data=sales_data,
-            sales_type="b2ba",
-            invoice_term="inv",
-            gen_json=gen_json,
-            file_name=destination + "/" + file_name + "_GSTR_2A_b2ba_sales.json",
-        )
-
-        if gen_excel:
-            b2ba_sheet = work_book.create_sheet(title="B2BA")
-            write_invoices_to_excel(
-                work_sheet=b2ba_sheet,
-                invoice_list=invoice_list,
-                heading_map=b2ba_heading_map,
-                heading_list=b2ba_heading_list,
+                heading_map=heading_map,
+                heading_list=heading_list,
             )
 
 
 def write_all_invoices(
+    config_map,
     gen_excel,
     gen_json,
     path_to_json,
@@ -181,35 +96,59 @@ def write_all_invoices(
     zip_file_name,
 ):
 
+    invoice_config_list = []
+
+    b2b_config = {
+        "title": "B2B",
+        "list_name": "b2b",
+        "invoice_item_name": "inv",
+        "heading_map": b2b_heading_map,
+        "file_name": file_directory + "/" + file_name + "_GSTR_2A_b2b_sales.json",
+    }
+    b2b_cdnr_config = {
+        "title": "B2B Credit Notes",
+        "list_name": "cdn",
+        "invoice_item_name": "nt",
+        "heading_map": b2b_credit_notes_headings_map,
+        "file_name": file_directory
+        + "/"
+        + file_name
+        + "_GSTR_2A_b2b_sales_returns.json",
+    }
+    b2ba_config = {
+        "title": "B2B-Amendments",
+        "list_name": "b2ba",
+        "invoice_item_name": "inv",
+        "heading_map": b2ba_heading_map,
+        "file_name": file_directory + "/" + file_name + "_GSTR_2A_b2ba_sales.json",
+    }
+
+    if config_map["all"] or config_map["b2b"]:
+        invoice_config_list.append(b2b_config)
+    if config_map["all"] or config_map["b2b_cdnr"]:
+        invoice_config_list.append(b2b_cdnr_config)
+    if config_map["all"] or config_map["b2ba"]:
+        invoice_config_list.append(b2ba_config)
+
     if gen_excel:
         write_basic_data(
             work_book=work_book,
             basic_data=basic_data,
         )
-    write_b2b_invoices(
-        work_book=work_book,
-        file_name=file_name,
-        gen_excel=gen_excel,
-        gen_json=gen_json,
-        path_to_json=path_to_json,
-        destination=file_directory,
-    )
-    write_b2b_credit_note_invoices(
-        work_book=work_book,
-        file_name=file_name,
-        gen_excel=gen_excel,
-        gen_json=gen_json,
-        path_to_json=path_to_json,
-        destination=file_directory,
-    )
-    write_b2ba_invoices(
-        work_book=work_book,
-        file_name=file_name,
-        gen_excel=gen_excel,
-        gen_json=gen_json,
-        path_to_json=path_to_json,
-        destination=file_directory,
-    )
+
+    for config in invoice_config_list:
+        invoices_writer(
+            work_book=work_book,
+            sheet_name=config["title"],
+            file_name=config["file_name"],
+            sales_data_list_name=config["list_name"],
+            invoice_item_name=config["invoice_item_name"],
+            gen_excel=gen_excel,
+            gen_json=gen_json,
+            heading_map=config["heading_map"],
+            path_to_json=path_to_json,
+        )
+
     if gen_excel:
         work_book.save(file_directory + "/GSTR_2A_" + file_name + ".xlsx")
 
@@ -221,14 +160,14 @@ def write_all_invoices(
 
 
 def start_gstr_2_process():
-    global basic_data, app_mode, app_generation_mode, force_close
+    global basic_data, app_mode, app_generation_mode, extract_invoice_config, force_close
     global create_file_dir_modes, create_excel_dir_modes, gstr_2_ui
     global work_book, file_name, file_directory, loader_sub_window
 
     user_input_dirs = get_user_json_directory(
         app_generation_mode=app_generation_mode,
-        source_dir_label=gstr_2_ui.source_dir_label,
-        final_dir_label=gstr_2_ui.final_dir_label,
+        source_dir_entry=gstr_2_ui.source_dir_label,
+        final_dir_entry=gstr_2_ui.final_dir_label,
         status_text=gstr_2_ui.app_status_text,
     )
 
@@ -274,6 +213,13 @@ def start_gstr_2_process():
                 except OSError:
                     gstr_2_ui.app_status_text.config(text="Status - Folder Error - ")
                 else:
+                    config_map = {
+                        "all": extract_invoice_config == "all",
+                        "b2b": extract_invoice_config == "b2b",
+                        "b2b_cdnr": extract_invoice_config == "b2b_cdnr",
+                        "b2ba": extract_invoice_config == "b2ba",
+                    }
+
                     gen_json = app_mode in create_file_dir_modes
                     gen_excel = app_mode in create_excel_dir_modes
                     zip_it = app_mode == "zipped"
@@ -285,6 +231,7 @@ def start_gstr_2_process():
                         title=f"Processing - {basic_data['fp']}",
                         text="Please Wait while we Process the Data, Take a Sip of Coffee till we finish",
                         function=write_all_invoices,
+                        config_map=config_map,
                         gen_excel=gen_excel,
                         gen_json=gen_json,
                         path_to_json=json_file,
@@ -318,16 +265,24 @@ def start_gstr_2_process():
                 message="App has Finished Processing the Files\n\nDo you like to Restart the App ?",
             )
             if restart_app_input:
-                gstr_2_ui.source_dir_label.config(text=" ")
-                gstr_2_ui.final_dir_label.config(text=" ")
+                gstr_2_ui.source_dir_entry.config(state="normal")
+                gstr_2_ui.final_dir_entry.config(state="normal")
+                gstr_2_ui.source_dir_entry.delete(0, "end")
+                gstr_2_ui.final_dir_entry.delete(0, "end")
+                gstr_2_ui.source_dir_entry.config(state="disabled")
+                gstr_2_ui.final_dir_entry.config(state="disabled")
             else:
                 force_close = True
                 gstr_2_ui.close_window()
 
         else:
             gstr_2_ui.app_status_text.config(text="Status - Ready to Process")
-            gstr_2_ui.source_dir_label.config(text=" ")
-            gstr_2_ui.final_dir_label.config(text=" ")
+            gstr_2_ui.source_dir_entry.config(state="normal")
+            gstr_2_ui.final_dir_entry.config(state="normal")
+            gstr_2_ui.source_dir_entry.delete(0, "end")
+            gstr_2_ui.final_dir_entry.delete(0, "end")
+            gstr_2_ui.source_dir_entry.config(state="disabled")
+            gstr_2_ui.final_dir_entry.config(state="disabled")
 
 
 def set_app_generation_mode():
@@ -340,6 +295,16 @@ def set_app_processing_mode():
     global app_mode
 
     app_mode = gstr_2_ui.app_processing_mode_var.get()
+
+
+def set_extract_invoice_config(event=None):
+    global gstr_2_ui, extract_invoice_config, extract_invoice_options
+
+    option_selected = gstr_2_ui.invoice_config_var.get()
+
+    for (option_key, option_value) in extract_invoice_options.items():
+        if option_value == option_selected:
+            extract_invoice_config = option_key
 
 
 def initiate_force_close():
@@ -358,6 +323,11 @@ def start_window_app():
         commands={
             "app_generation": set_app_generation_mode,
             "app_processing": set_app_processing_mode,
+            "invoice_extract_options": {
+                "options": extract_invoice_options,
+                "default": "All Invoices",
+                "command": set_extract_invoice_config,
+            },
         },
         start_button=start_gstr_2_process,
         menu=True,
@@ -378,6 +348,14 @@ force_close = False
 
 app_mode = "excel"
 app_generation_mode = "single"
+
+extract_invoice_config = "all"
+extract_invoice_options = {
+    "all": "All Invoices",
+    "b2b": "B2B Invoices",
+    "b2b_cdnr": "B2B Credit Notes",
+    "b2ba": "B2B Amendments",
+}
 
 create_file_dir_modes = ["excel-json", "zipped", "json"]
 create_excel_dir_modes = ["excel-json", "zipped", "excel"]

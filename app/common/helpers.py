@@ -28,7 +28,7 @@ def get_json_sales_data(path_to_json):
 
 
 def get_user_json_directory(
-    app_generation_mode, source_dir_label, final_dir_label, status_text
+    app_generation_mode, source_dir_entry, final_dir_entry, status_text
 ):
 
     if len(app_generation_mode) > 1:
@@ -45,14 +45,20 @@ def get_user_json_directory(
             )
 
         if len(source_directory) > 2:
-            source_dir_label.config(text="Source:  " + source_directory.lower())
+            source_dir_entry.config(state='normal')
+            source_dir_entry.delete(0, "end")
+            source_dir_entry.insert(0, source_directory.lower())
+            source_dir_entry.config(state='disabled')
 
             final_directory = filedialog.askdirectory(
                 title="Select the Destination Directory to Store the Excel Files after Processing"
             )
 
             if len(final_directory) > 2:
-                final_dir_label.config(text="Destination: " + final_directory.lower())
+                final_dir_entry.config(state='normal')
+                final_dir_entry.delete(0, "end")
+                final_dir_entry.insert(0, final_directory.lower())
+                final_dir_entry.config(state='disabled')
 
             corrected_source_dir = (
                 Path(source_directory.lower())
@@ -106,9 +112,7 @@ def basic_data_function(work_sheet, basic_data, heading_map):
         basic_data_column = start_column
 
 
-def gen_invoices_function(
-    sales_data, sales_type, invoice_term, gen_json, file_name
-):
+def gen_invoices_function(sales_data, sales_type, invoice_term, gen_json, file_name):
     invoice_list = []
     if not sales_type == "b2cs":
         for sales in sales_data[sales_type]:
@@ -194,9 +198,7 @@ def write_basic_data_sheet(work_sheet, basic_data, heading_map):
         raise basic_data_thread.error
 
 
-def generate_invoices_list(
-    sales_data, sales_type, invoice_term, gen_json, file_name
-):
+def generate_invoices_list(sales_data, sales_type, invoice_term, gen_json, file_name):
     gen_invoices_thread = threader(
         function=gen_invoices_function,
         sales_data=sales_data,
