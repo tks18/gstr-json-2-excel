@@ -1,8 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
 
 from app.common.ui.base import base_ui
-
+from app.common.ui.check_box_window import check_box_window
 from app.common.ui.common import BG, FG
 
 
@@ -70,34 +69,18 @@ class gst_utils_ui(base_ui):
                 command=commands["app_processing"],
             ).grid(row=mode_vals["row"], column=mode_vals["column"])
 
-        self.invoice_config_label = tk.Label(
-            self.ui, text="Select Invoices to Extract", fg=FG, bg=BG
-        )
-        self.invoice_config_label.grid(row=7, column=0, columnspan=2)
-
-        self.ui.option_add("*TCombobox*Listbox*Background", BG)
-        self.ui.option_add("*TCombobox*Listbox.foreground", FG)
-
-        self.invoice_config_var = tk.StringVar(
-            self.ui, commands["invoice_extract_options"]["default"]
-        )
-        drop_down_options = commands["invoice_extract_options"]["options"]
-        drop_down_tuple = tuple(
-            drop_down_options[option_key] for option_key in drop_down_options
-        )
-        self.invoice_config_drop_down = ttk.Combobox(
+        self.invoice_config_button = tk.Button(
             self.ui,
-            values=drop_down_tuple,
-            state="readonly",
-            textvariable=self.invoice_config_var,
-            width=25,
-            background=BG,
-            foreground=FG,
+            text="Select Invoices to Extract",
+            command=self.wait_for_checkbox_selector,
+            fg=FG,
+            bg=BG,
         )
-        self.invoice_config_drop_down.grid(row=7, column=2, columnspan=2, pady=(3, 3))
-        self.invoice_config_drop_down.bind(
-            "<<ComboboxSelected>>", commands["invoice_extract_options"]["command"]
-        )
+
+        self.invoice_extract_options_selected = None
+        self.invoices_config_options = commands["invoice_extract_options"]["options"]
+
+        self.invoice_config_button.grid(row=7, column=0, columnspan=4)
 
         self.source_dir_label = tk.Label(
             self.ui, text="Source: ", bg=BG, fg=FG, wraplength=450
@@ -140,7 +123,7 @@ class gst_utils_ui(base_ui):
         )
         self.start_gstr_1_process_button.grid(row=10, column=0, columnspan=4)
 
-        self.open_final_dir_var = tk.BooleanVar(self.ui, True)
+        self.open_final_dir_var = tk.BooleanVar(self.ui, False)
         self.open_final_dir_checkButton = tk.Checkbutton(
             self.ui,
             text="Open the Destination Directory after Finish",
@@ -165,3 +148,13 @@ class gst_utils_ui(base_ui):
             pady=5,
         )
         self.app_status_text.grid(row=12, column=0, columnspan=4)
+
+    def wait_for_checkbox_selector(self):
+        self.check_box_ui = check_box_window(
+            self.ui,
+            "Select Invoices to Extract",
+            self.invoices_config_options,
+            self.invoice_extract_options_selected,
+        )
+        self.ui.wait_window(self.check_box_ui.ui)
+        self.invoice_extract_options_selected = self.check_box_ui.result

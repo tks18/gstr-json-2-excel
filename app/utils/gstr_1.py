@@ -5,16 +5,15 @@ from tkinter import messagebox
 from openpyxl import Workbook
 
 # Other Imports
-from app.common.ui.utils import gst_utils_ui
-from app.common.ui.loader import loader_window
-from app.common.helpers import (
+from app.common.ui.utils_ui import gst_utils_ui
+from app.common.ui.loader_window import loader_window
+from app.common.utilities.invoice_writer import invoices_writer
+from app.common.utilities.path_helpers import (
     get_user_json_directory,
     get_json_sales_data,
-    write_basic_data_sheet,
-    generate_invoices_list,
-    write_invoices_to_excel,
-    make_archive,
 )
+from app.common.utilities.basic_data_writer import write_basic_data_sheet
+from app.common.utilities.archive import make_archive
 
 # heading map imports
 from app.common.heading_maps.gstr_1 import *
@@ -29,54 +28,6 @@ def generate_basic_data(path_to_json):
             data.pop(key)
 
     return data
-
-
-def write_basic_data(work_book, basic_data):
-
-    basic_data_sheet = work_book["Sheet"]
-    basic_data_sheet.title = "Basic Data"
-
-    write_basic_data_sheet(
-        work_sheet=basic_data_sheet,
-        basic_data=basic_data,
-        heading_map=basic_data_heading_map,
-    )
-
-
-def invoices_writer(
-    work_book,
-    sheet_name,
-    file_name,
-    sales_data_list_name,
-    invoice_item_name,
-    gen_json,
-    gen_excel,
-    heading_map,
-    path_to_json,
-):
-
-    invoice_list = []
-    heading_list = [heading for heading in heading_map]
-
-    sales_data = get_json_sales_data(path_to_json)
-    if sales_data_list_name in sales_data:
-
-        invoice_list = generate_invoices_list(
-            sales_data=sales_data,
-            sales_type=sales_data_list_name,
-            invoice_term=invoice_item_name,
-            gen_json=gen_json,
-            file_name=file_name,
-        )
-
-        if gen_excel:
-            b2b_sheet = work_book.create_sheet(sheet_name)
-            write_invoices_to_excel(
-                work_sheet=b2b_sheet,
-                invoice_list=invoice_list,
-                heading_map=heading_map,
-                heading_list=heading_list,
-            )
 
 
 def write_all_invoices(
@@ -130,21 +81,22 @@ def write_all_invoices(
         "file_name": file_directory + "/" + file_name + "_GSTR1_b2ba_sales.json",
     }
 
-    if config_map["all"] or config_map["b2b"]:
+    if config_map["b2b"]:
         invoice_config_list.append(b2b_config)
-    if config_map["all"] or config_map["b2b_cdnr"]:
+    if config_map["b2b_cdnr"]:
         invoice_config_list.append(b2b_cdnr_config)
-    if config_map["all"] or config_map["b2cs"]:
+    if config_map["b2cs"]:
         invoice_config_list.append(b2cs_config)
-    if config_map["all"] or config_map["exp"]:
+    if config_map["exp"]:
         invoice_config_list.append(export_config)
-    if config_map["all"] or config_map["b2ba"]:
+    if config_map["b2ba"]:
         invoice_config_list.append(b2ba_config)
 
     if gen_excel:
-        write_basic_data(
+        write_basic_data_sheet(
             work_book=work_book,
             basic_data=basic_data,
+            heading_map=basic_data_heading_map,
         )
 
     for config in invoice_config_list:
@@ -172,7 +124,7 @@ def write_all_invoices(
 
 def start_gstr_1_process():
     global basic_data, app_mode, app_generation_mode, extract_invoice_config, force_close
-    global create_file_dir_modes, create_excel_dir_modes, gstr_1_ui
+    global create_file_dir_modes, create_excel_dir_modes, gstr_1_ui, extract_invoice_options
     global work_book, file_name, file_directory, loader_sub_window
 
     user_input_dirs = get_user_json_directory(
@@ -224,14 +176,7 @@ def start_gstr_1_process():
                 except OSError:
                     gstr_1_ui.app_status_text.config(text="Status - Folder Error")
                 else:
-                    config_map = {
-                        "all": extract_invoice_config == "all",
-                        "b2b": extract_invoice_config == "b2b",
-                        "b2b_cdnr": extract_invoice_config == "b2b_cdnr",
-                        "b2cs": extract_invoice_config == "b2cs",
-                        "exp": extract_invoice_config == "exp",
-                        "b2ba": extract_invoice_config == "b2ba",
-                    }
+                    config_map = gstr_1_ui.invoice_extract_options_selected
                     gen_json = app_mode in create_file_dir_modes
                     gen_excel = app_mode in create_excel_dir_modes
                     zip_it = app_mode == "zipped"
@@ -363,7 +308,6 @@ app_generation_mode = "single"
 
 extract_invoice_config = "all"
 extract_invoice_options = {
-    "all": "All Invoices",
     "b2b": "B2B Invoices",
     "b2b_cdnr": "B2B Credit Notes",
     "b2cs": "B2C Small Invoices",
