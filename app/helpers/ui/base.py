@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 
-from app.common.utilities.path_helpers import resource_path
+from app.helpers.utilities.path_helpers import resource_path
 
-from app.common.ui.common import BG, FG, TTK_THEME
+from app.helpers.ui.common import BG, FG, TTK_THEME
 
 
 class base_ui:

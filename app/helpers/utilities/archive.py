@@ -1,5 +1,5 @@
 import shutil
-from app.common.threader import threader
+from app.helpers.threader import threader
 
 
 def archive_function(path_to_files, file_name):

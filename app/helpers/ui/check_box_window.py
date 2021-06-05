@@ -1,5 +1,5 @@
 import tkinter as tk
-from app.common.ui.common import BG, FG
+from app.helpers.ui.common import BG, FG
 
 
 class check_box_window:

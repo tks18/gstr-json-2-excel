@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter.ttk import Progressbar
-from app.common.threader import threader
+from app.helpers.threader import threader
 
-from app.common.ui.common import BG, FG
+from app.helpers.ui.common import BG, FG
 
 
 class loader_window:

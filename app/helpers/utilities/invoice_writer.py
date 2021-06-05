@@ -1,8 +1,8 @@
-from app.common.utilities.path_helpers import get_json_sales_data
+from app.helpers.utilities.path_helpers import get_json_sales_data
 
 
-from app.common.utilities.invoice_generator import generate_invoices_list
-from app.common.utilities.invoice_writer_helper import write_invoices_to_excel
+from app.helpers.utilities.invoice_generator import generate_invoices_list
+from app.helpers.utilities.invoice_writer_helper import write_invoices_to_excel
 
 
 def invoices_writer(

@@ -1,8 +1,8 @@
 import tkinter as tk
 
-from app.common.ui.base import base_ui
-from app.common.ui.check_box_window import check_box_window
-from app.common.ui.common import BG, FG
+from app.helpers.ui.base import base_ui
+from app.helpers.ui.check_box_window import check_box_window
+from app.helpers.ui.common import BG, FG
 
 
 class gst_utils_ui(base_ui):

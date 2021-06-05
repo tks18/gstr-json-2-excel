@@ -5,18 +5,18 @@ from tkinter import messagebox
 from openpyxl import Workbook
 
 # Other Imports
-from app.common.ui.utils_ui import gst_utils_ui
-from app.common.ui.loader_window import loader_window
-from app.common.utilities.invoice_writer import invoices_writer
-from app.common.utilities.path_helpers import (
+from app.helpers.ui.utils_ui import gst_utils_ui
+from app.helpers.ui.loader_window import loader_window
+from app.helpers.utilities.invoice_writer import invoices_writer
+from app.helpers.utilities.path_helpers import (
     get_user_json_directory,
     get_json_sales_data,
 )
-from app.common.utilities.basic_data_writer import write_basic_data_sheet
-from app.common.utilities.archive import make_archive
+from app.helpers.utilities.basic_data_writer import write_basic_data_sheet
+from app.helpers.utilities.archive import make_archive
 
 # heading map imports
-from app.common.heading_maps.gstr_1 import *
+from app.helpers.heading_maps.gstr_1 import *
 
 
 def generate_basic_data(path_to_json):

@@ -1,7 +1,7 @@
 import tkinter as tk
-from app.common.ui.base import base_ui
+from app.helpers.ui.base import base_ui
 
-from app.common.ui.common import BG, FG
+from app.helpers.ui.common import BG, FG
 
 
 class gst_reco_ui(base_ui):

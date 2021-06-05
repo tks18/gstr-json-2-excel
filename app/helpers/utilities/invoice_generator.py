@@ -1,6 +1,6 @@
 import json
 from flatten_json import flatten
-from app.common.threader import threader
+from app.helpers.threader import threader
 
 
 def gen_invoices_function(sales_data, sales_type, invoice_term, gen_json, file_name):

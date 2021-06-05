@@ -2,9 +2,9 @@ from app.reco.gstr_9c.paths import get_paths, get_file
 from app.reco.gstr_9c.generators.initializer import initialize_new_project
 from app.reco.gstr_9c.generators.project_configs import load_toml_config
 
-from app.common.ui.text_box_window import text_box_window
-from app.common.ui.reco_ui import gst_reco_ui
-from app.common.ui.loader_window import loader_window
+from app.helpers.ui.text_box_window import text_box_window
+from app.helpers.ui.reco_ui import gst_reco_ui
+from app.helpers.ui.loader_window import loader_window
 
 
 def initialize_project():

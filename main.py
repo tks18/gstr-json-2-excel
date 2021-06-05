@@ -2,7 +2,7 @@ import app.utils.gstr_1 as gstr_1_utils
 import app.utils.gstr_2 as gstr_2_utils
 import app.reco.gstr_9c.main as gstr_9c_utils
 
-from app.common.ui.main_ui import main_window
+from app.helpers.ui.main_ui import main_window
 
 
 def main_ui_window():
