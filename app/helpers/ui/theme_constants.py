@@ -5,11 +5,12 @@ ACCENT = "#e84545"
 THEME = {"background": BG, "foreground": FG}
 
 FONTS = {
-    "small": ("Arial", 9, "normal"),
-    "small_bold": ("Arial", 9, "bold"),
-    "medium": ("Arial", 10, "normal"),
-    "medium_bold": ("Arial", 10, "bold"),
-    "title": ("Arial", 20, "bold"),
+    "small": ("Roboto", 9, "normal"),
+    "small_bold": ("Roboto", 9, "bold"),
+    "medium": ("Roboto", 10, "normal"),
+    "medium_bold": ("Roboto", 10, "normal"),
+    "title": ("Roboto", 20, "bold"),
+    "title_big": ("Roboto", 25, "bold"),
 }
 
 TTK_THEME = {

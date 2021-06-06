@@ -25,7 +25,7 @@ class base_ui:
                 text="Menu",
                 command=self.close_window,
                 **self.theme,
-                font=self.FONTS["medium_bold"],
+                font=self.FONTS["medium"],
             )
             self.menu_button.grid(
                 row=0,
@@ -36,7 +36,7 @@ class base_ui:
                 self.ui,
                 text="About",
                 **self.theme,
-                font=self.FONTS["medium_bold"],
+                font=self.FONTS["medium"],
             )
             self.about_button.grid(row=0, column=1)
 
@@ -49,7 +49,7 @@ class base_ui:
         self.main_title = tk.Label(
             master=self.ui,
             text=title,
-            font=self.FONTS["title"],
+            font=self.FONTS["title_big"],
             pady=40,
             **self.theme,
         )

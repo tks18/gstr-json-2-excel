@@ -8,10 +8,12 @@ import sys
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
+        sub_path = "gstr-utils-"
     except Exception:
         base_path = osPath.abspath(".")
+        sub_path = ""
 
-    return osPath.join(base_path, relative_path)
+    return osPath.join(base_path, f"{sub_path}{relative_path}")
 
 
 def get_json_sales_data(path_to_json):

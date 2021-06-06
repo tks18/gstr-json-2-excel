@@ -6,7 +6,7 @@ block_cipher = None
 a = Analysis(['main.py'],
              pathex=['G:\\Development Projects\\Python Projects\\gstr-json-2-excel'],
              binaries=[],
-             datas=[('images/logo.png', 'images'), ('images/logo.ico', 'images')],
+             datas=[('images/logo.png', 'gstr-utils-images'), ('images/logo.ico', 'gstr-utils-images'), ('fonts/Roboto-Bold.ttf', 'gstr-utils-fonts'), ('fonts/Roboto-Regular.ttf', 'gstr-utils-fonts')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -30,4 +30,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False , icon='G:\\Development Projects\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')
+          console=True , icon='G:\\Development Projects\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')

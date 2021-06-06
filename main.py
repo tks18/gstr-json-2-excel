@@ -3,6 +3,7 @@ import app.utils.gstr_2 as gstr_2_utils
 import app.reco.gstr_9c.main as gstr_9c_utils
 
 from app.helpers.ui.main_ui import main_window
+from app.helpers.font_loader import initialize_fonts
 
 
 def main_ui_window():
@@ -74,4 +75,5 @@ def open_gstr_9c_window():
 main_ui = None
 
 if __name__ == "__main__":
+    initialize_fonts()
     main_ui_window()
