@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter.ttk import Progressbar
 from app.helpers.threader import threader
+from app.helpers.utilities.path_helpers import resource_path
 
 
 class loader_window:
@@ -8,6 +9,8 @@ class loader_window:
         self.ui = tk.Toplevel(master=master.ui)
         self.ui.title(title)
         self.ui.config(bg=master.bg, padx=15, pady=7)
+        self.icon = tk.PhotoImage(file=resource_path("images/logo.png"))
+        self.ui.iconphoto(False, self.icon)
 
         self.function = function
         self.function_args = function_args

@@ -30,4 +30,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True , icon='G:\\Development Projects\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')
+          console=False , icon='G:\\Development Projects\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')

@@ -1,12 +1,14 @@
 import tkinter as tk
+from app.helpers.utilities.path_helpers import resource_path
 
 
 class text_box_window:
     def __init__(self, master, title, labels):
         self.ui = tk.Toplevel(master=master.ui)
         self.ui.title(title)
-
         self.ui.config(bg=master.bg, padx=15, pady=7)
+        self.icon = tk.PhotoImage(file=resource_path("images/logo.png"))
+        self.ui.iconphoto(False, self.icon)
 
         self.label_props = labels
         self.label = {}
