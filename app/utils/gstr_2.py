@@ -174,7 +174,7 @@ def start_gstr_2_process():
                     gstr_2_ui.ui.withdraw()
 
                     loader_sub_window = loader_window(
-                        master=gstr_2_ui.ui,
+                        master=gstr_2_ui,
                         title=f"Processing - {basic_data['fp']}",
                         text="Please Wait while we Process the Data, Take a Sip of Coffee till we finish",
                         function=write_all_invoices,

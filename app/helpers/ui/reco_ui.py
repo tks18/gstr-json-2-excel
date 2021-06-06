@@ -1,8 +1,6 @@
 import tkinter as tk
 from app.helpers.ui.base import base_ui
 
-from app.helpers.ui.common import BG, FG
-
 
 class gst_reco_ui(base_ui):
     def __init__(self, window_title, title, button_commands, menu):
@@ -14,12 +12,14 @@ class gst_reco_ui(base_ui):
         self.button_commands = button_commands
 
         self.project_init_status = tk.Label(
-            self.ui, text="Project: Not Initialized", fg=FG, bg=BG
+            self.ui,
+            text="Project: Not Initialized",
+            **self.theme,
         )
         self.project_init_status.grid(row=3, column=0, columnspan=maxcol, pady=(0, 10))
 
         self.project_command_label = tk.Label(
-            self.ui, text="Manage Project", fg=FG, bg=BG
+            self.ui, text="Manage Project", **self.theme,
         )
         self.project_command_label.grid(row=4, column=0, columnspan=maxcol)
 
@@ -30,8 +30,7 @@ class gst_reco_ui(base_ui):
                     self.ui,
                     text=button_key,
                     command=button_props["command"],
-                    fg=FG,
-                    bg=BG,
+                    **self.theme,
                 )
                 self.project_command_buttons[button_key].grid(
                     row=button_props["row"],
@@ -44,8 +43,7 @@ class gst_reco_ui(base_ui):
             self.ui,
             text=button_commands["reset_button"]["title"],
             command=button_commands["reset_button"]["command"],
-            fg=FG,
-            bg=BG,
+            **self.theme,
         )
         self.reset_button.grid(
             row=button_commands["reset_button"]["row"],
@@ -58,8 +56,7 @@ class gst_reco_ui(base_ui):
             self.ui,
             text=button_commands["start_button"]["title"],
             command=button_commands["start_button"]["command"],
-            fg=FG,
-            bg=BG,
+            **self.theme,
         )
         self.start_button.grid(
             row=button_commands["start_button"]["row"],

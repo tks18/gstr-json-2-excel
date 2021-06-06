@@ -1,12 +1,12 @@
 import tkinter as tk
-from app.helpers.ui.common import BG, FG
 
 
 class text_box_window:
     def __init__(self, master, title, labels):
-        self.ui = tk.Toplevel(master=master)
+        self.ui = tk.Toplevel(master=master.ui)
         self.ui.title(title)
-        self.ui.config(bg=BG, padx=15, pady=7)
+
+        self.ui.config(bg=master.bg, padx=15, pady=7)
 
         self.label_props = labels
         self.label = {}
@@ -14,7 +14,9 @@ class text_box_window:
         row_no = 0
         for (label_key, label_text) in labels.items():
             self.label[label_key] = tk.Label(
-                self.ui, text=f"{label_text}: ", bg=BG, fg=FG
+                self.ui,
+                text=f"{label_text}: ",
+                **master.theme,
             )
             self.label[label_key].grid(
                 row=row_no, column=0, columnspan=1, padx=5, pady=5
@@ -23,12 +25,11 @@ class text_box_window:
             self.text_box[label_key] = tk.Entry(
                 self.ui,
                 width=40,
-                bg=BG,
-                fg=FG,
-                insertbackground=FG,
-                highlightcolor=FG,
+                **master.theme,
+                insertbackground=master.fg,
+                highlightcolor=master.fg,
                 highlightthickness=1,
-                highlightbackground=FG,
+                highlightbackground=master.fg,
             )
             self.text_box[label_key].grid(
                 row=row_no, column=1, columnspan=2, padx=5, pady=5
@@ -42,12 +43,18 @@ class text_box_window:
         self.ui.protocol("WM_DELETE_WINDOW", self.cancel_action)
 
         self.accept_button = tk.Button(
-            self.ui, text="Accept", command=self.accept_action, bg=BG, fg=FG
+            self.ui,
+            text="Accept",
+            command=self.accept_action,
+            **master.theme,
         )
         self.accept_button.grid(row=row_no + 1, column=0, columnspan=2)
 
         self.cancel_button = tk.Button(
-            self.ui, text="Cancel", command=self.accept_action, bg=BG, fg=FG
+            self.ui,
+            text="Cancel",
+            command=self.accept_action,
+            **master.theme,
         )
         self.cancel_button.grid(row=row_no + 1, column=1, columnspan=2)
 

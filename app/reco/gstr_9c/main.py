@@ -49,7 +49,7 @@ def load_saved_project():
 def start_loader():
     global gstr_9c_ui
 
-    loader = loader_window(master=gstr_9c_ui.ui, title="Super", text="Super")
+    loader = loader_window(master=gstr_9c_ui, title="Super", text="Super")
     loader.start_animation()
 
 

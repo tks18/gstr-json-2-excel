@@ -2,14 +2,12 @@ import tkinter as tk
 from tkinter.ttk import Progressbar
 from app.helpers.threader import threader
 
-from app.helpers.ui.common import BG, FG
-
 
 class loader_window:
     def __init__(self, master, title, text, function, **function_args):
-        self.ui = tk.Toplevel(master=master)
+        self.ui = tk.Toplevel(master=master.ui)
         self.ui.title(title)
-        self.ui.config(bg=BG, padx=15, pady=7)
+        self.ui.config(bg=master.bg, padx=15, pady=7)
 
         self.function = function
         self.function_args = function_args
@@ -24,7 +22,7 @@ class loader_window:
         )
         self.loader.pack()
 
-        self.label = tk.Label(master=self.ui, text=text, fg=FG, bg=BG)
+        self.label = tk.Label(master=self.ui, text=text, **master.theme)
         self.label.pack()
         self.loader.start()
         self.ui.focus_force()

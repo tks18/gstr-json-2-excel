@@ -2,14 +2,15 @@ import tkinter as tk
 
 from app.helpers.ui.base import base_ui
 from app.helpers.ui.check_box_window import check_box_window
-from app.helpers.ui.common import BG, FG
 
 
 class gst_utils_ui(base_ui):
     def __init__(self, window_title, title, commands, start_button, menu):
         super(gst_utils_ui, self).__init__(window_title, title, menu)
         self.app_generation_mode_label = tk.Label(
-            self.ui, text="Select App Working Mode", bg=BG, fg=FG
+            self.ui,
+            text="Select App Working Mode",
+            **self.theme,
         )
         self.app_generation_mode_label.grid(row=3, column=0, columnspan=4)
         self.app_generation_mode_var = tk.StringVar(self.ui, "single")
@@ -23,9 +24,8 @@ class gst_utils_ui(base_ui):
                 text=modes,
                 variable=self.app_generation_mode_var,
                 value=mode_vals["value"],
-                bg=BG,
-                fg=FG,
-                selectcolor=BG,
+                **self.theme,
+                selectcolor=self.bg,
                 command=commands["app_generation"],
             ).grid(
                 row=mode_vals["row"],
@@ -34,7 +34,9 @@ class gst_utils_ui(base_ui):
             )
 
         self.app_processing_mode_label = tk.Label(
-            self.ui, text="Select File Processing Mode", bg=BG, fg=FG
+            self.ui,
+            text="Select File Processing Mode",
+            **self.theme,
         )
         self.app_processing_mode_var = tk.StringVar(self.ui, "excel")
         self.app_processing_mode_label.grid(row=5, column=0, columnspan=4)
@@ -63,9 +65,8 @@ class gst_utils_ui(base_ui):
                 text=modes,
                 variable=self.app_processing_mode_var,
                 value=mode_vals["value"],
-                bg=BG,
-                fg=FG,
-                selectcolor=BG,
+                **self.theme,
+                selectcolor=self.bg,
                 command=commands["app_processing"],
             ).grid(row=mode_vals["row"], column=mode_vals["column"])
 
@@ -73,8 +74,7 @@ class gst_utils_ui(base_ui):
             self.ui,
             text="Select Invoices to Extract",
             command=self.wait_for_checkbox_selector,
-            fg=FG,
-            bg=BG,
+            **self.theme,
         )
 
         self.invoice_extract_options_selected = None
@@ -83,43 +83,50 @@ class gst_utils_ui(base_ui):
         self.invoice_config_button.grid(row=7, column=0, columnspan=4)
 
         self.source_dir_label = tk.Label(
-            self.ui, text="Source: ", bg=BG, fg=FG, wraplength=450
+            self.ui,
+            text="Source: ",
+            **self.theme,
+            wraplength=450,
         )
         self.source_dir_label.grid(row=8, column=0, columnspan=1, pady=(10, 0))
         self.source_dir_entry = tk.Entry(
             self.ui,
             state="disabled",
             width=40,
-            disabledbackground=BG,
-            background=BG,
-            disabledforeground=FG,
-            foreground=FG,
-            insertbackground=FG,
-            highlightcolor=FG,
-            highlightbackground=FG,
+            **self.theme,
+            disabledbackground=self.bg,
+            disabledforeground=self.fg,
+            insertbackground=self.fg,
+            highlightcolor=self.fg,
+            highlightbackground=self.fg,
         )
         self.source_dir_entry.grid(row=8, column=1, columnspan=3, pady=(10, 0))
 
         self.final_dir_label = tk.Label(
-            self.ui, text="Dest: ", bg=BG, fg=FG, wraplength=450
+            self.ui,
+            text="Dest: ",
+            **self.theme,
+            wraplength=450,
         )
         self.final_dir_label.grid(row=9, column=0, columnspan=1, pady=(0, 10))
         self.final_dir_entry = tk.Entry(
             self.ui,
             state="disabled",
             width=40,
-            disabledbackground=BG,
-            background=BG,
-            disabledforeground=FG,
-            foreground=FG,
-            insertbackground=FG,
-            highlightcolor=FG,
-            highlightbackground=FG,
+            **self.theme,
+            disabledbackground=self.bg,
+            disabledforeground=self.fg,
+            insertbackground=self.fg,
+            highlightcolor=self.fg,
+            highlightbackground=self.fg,
         )
         self.final_dir_entry.grid(row=9, column=1, columnspan=3, pady=(0, 10))
 
         self.start_gstr_1_process_button = tk.Button(
-            self.ui, text="Start Processing", command=start_button, bg=BG, fg=FG
+            self.ui,
+            text="Start Processing",
+            command=start_button,
+            **self.theme,
         )
         self.start_gstr_1_process_button.grid(row=10, column=0, columnspan=4)
 
@@ -128,12 +135,11 @@ class gst_utils_ui(base_ui):
             self.ui,
             text="Open the Destination Directory after Finish",
             variable=self.open_final_dir_var,
-            fg=FG,
-            background=BG,
-            activebackground=BG,
-            activeforeground=FG,
-            highlightcolor=BG,
-            selectcolor=BG,
+            **self.theme,
+            activebackground=self.bg,
+            activeforeground=self.fg,
+            highlightcolor=self.bg,
+            selectcolor=self.bg,
             onvalue=True,
             offvalue=False,
         )
@@ -142,8 +148,7 @@ class gst_utils_ui(base_ui):
         self.app_status_text = tk.Label(
             self.ui,
             text="Status - Ready to Process",
-            bg=BG,
-            fg=FG,
+            **self.theme,
             padx=5,
             pady=5,
         )
@@ -151,7 +156,7 @@ class gst_utils_ui(base_ui):
 
     def wait_for_checkbox_selector(self):
         self.check_box_ui = check_box_window(
-            self.ui,
+            self,
             "Select Invoices to Extract",
             self.invoices_config_options,
             self.invoice_extract_options_selected,

@@ -1,12 +1,11 @@
 import tkinter as tk
-from app.helpers.ui.common import BG, FG
 
 
 class check_box_window:
     def __init__(self, master, title, check_box_options, saved_options=None):
-        self.ui = tk.Toplevel(master=master)
+        self.ui = tk.Toplevel(master=master.ui)
         self.ui.title(title)
-        self.ui.config(bg=BG, padx=15, pady=7)
+        self.ui.config(bg=master.bg, padx=15, pady=7)
 
         self.check_box_options = [
             {key: prop} for (key, prop) in check_box_options.items()
@@ -29,13 +28,12 @@ class check_box_window:
                     self.ui,
                     text=prop,
                     variable=self.check_box_vars[key],
-                    fg=FG,
+                    **master.theme,
                     command=self.check_box_result_builder,
-                    background=BG,
-                    activebackground=BG,
-                    activeforeground=FG,
-                    highlightcolor=BG,
-                    selectcolor=BG,
+                    activebackground=master.bg,
+                    activeforeground=master.fg,
+                    highlightcolor=master.bg,
+                    selectcolor=master.bg,
                     onvalue=True,
                     offvalue=False,
                 )
@@ -64,13 +62,12 @@ class check_box_window:
             self.ui,
             text="Select All",
             variable=self.select_all_checkbox_var,
-            fg=FG,
+            **master.theme,
             command=self.select_all_command,
-            background=BG,
-            activebackground=BG,
-            activeforeground=FG,
-            highlightcolor=BG,
-            selectcolor=BG,
+            activebackground=master.bg,
+            activeforeground=master.fg,
+            highlightcolor=master.bg,
+            selectcolor=master.bg,
             onvalue=True,
             offvalue=False,
         )
