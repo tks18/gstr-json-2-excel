@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+
 block_cipher = None
 
 
@@ -23,11 +24,13 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='main',
+          name='Gstr Utils',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False , icon='G:\\Development Projects\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')
+          console=False,
+          version='version.txt',
+          icon='G:\\Development Projects\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')

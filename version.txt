@@ -1,0 +1,28 @@
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(2, 4, 1, 10522),
+    prodvers=(2, 4, 1, 10522),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)),
+    kids=[
+      StringFileInfo(
+        [
+        StringTable(
+          u'040904B0',
+          [StringStruct(u'CompanyName', u'Infozy Software Development'),
+          StringStruct(u'FileDescription', u'Goods and Services Tax Return Utilities'),
+          StringStruct(u'FileVersion', u'2.4.1.10522'),
+          StringStruct(u'InternalName', u'gstrutils'),
+          StringStruct(u'LegalCopyright', u'\xa9 Sudharshan TK. All rights reserved.'),
+          StringStruct(u'OriginalFilename', u'Gstr Utils.Exe'),
+          StringStruct(u'ProductName', u'GST\xae Utilities'),
+          StringStruct(u'ProductVersion', u'2.4.1.10522')])
+        ]
+      ), 
+    VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
+  ]
+)
