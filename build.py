@@ -15,14 +15,13 @@ SPECS = {
     "UNBUNDLED": {"file": str(Path(CWD, "unbundled.spec"))},
 }
 
-DEFAULT_ARGS = {"--upx-dir", "upx"}
-
 for (spec, spec_props) in SPECS.items():
     PyInstaller.__main__.run(
         [
             spec_props["file"],
             "-y",
-            *DEFAULT_ARGS,
+            "--upx-dir",
+            "upx",
         ]
     )
     if spec == "UNBUNDLED":
