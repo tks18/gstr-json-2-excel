@@ -5,12 +5,15 @@ from app.helpers.ui.check_box_window import check_box_window
 
 
 class gst_utils_ui(base_ui):
-    def __init__(self, window_title, title, commands, start_button, menu):
-        super(gst_utils_ui, self).__init__(window_title, title, menu)
+    def __init__(self, window_title, title, commands, start_button):
+        super(gst_utils_ui, self).__init__(
+            window_title=window_title, title=title, menu=False, logo=False
+        )
         self.app_generation_mode_label = tk.Label(
             self.ui,
             text="Select App Working Mode",
             **self.theme,
+            font=self.FONTS["small"],
         )
         self.app_generation_mode_label.grid(row=3, column=0, columnspan=4)
         self.app_generation_mode_var = tk.StringVar(self.ui, "single")
@@ -26,6 +29,7 @@ class gst_utils_ui(base_ui):
                 value=mode_vals["value"],
                 **self.theme,
                 selectcolor=self.bg,
+                font=self.FONTS["small_bold"],
                 command=commands["app_generation"],
             ).grid(
                 row=mode_vals["row"],
@@ -37,6 +41,7 @@ class gst_utils_ui(base_ui):
             self.ui,
             text="Select File Processing Mode",
             **self.theme,
+            font=self.FONTS["small"],
         )
         self.app_processing_mode_var = tk.StringVar(self.ui, "excel")
         self.app_processing_mode_label.grid(row=5, column=0, columnspan=4)
@@ -67,12 +72,14 @@ class gst_utils_ui(base_ui):
                 value=mode_vals["value"],
                 **self.theme,
                 selectcolor=self.bg,
+                font=self.FONTS["small_bold"],
                 command=commands["app_processing"],
             ).grid(row=mode_vals["row"], column=mode_vals["column"])
 
         self.invoice_config_button = tk.Button(
             self.ui,
             text="Select Invoices to Extract",
+            font=self.FONTS["small_bold"],
             command=self.wait_for_checkbox_selector,
             **self.theme,
         )
@@ -87,6 +94,7 @@ class gst_utils_ui(base_ui):
             text="Source: ",
             **self.theme,
             wraplength=450,
+            font=self.FONTS["small"],
         )
         self.source_dir_label.grid(row=8, column=0, columnspan=1, pady=(10, 0))
         self.source_dir_entry = tk.Entry(
@@ -107,6 +115,7 @@ class gst_utils_ui(base_ui):
             text="Dest: ",
             **self.theme,
             wraplength=450,
+            font=self.FONTS["small"],
         )
         self.final_dir_label.grid(row=9, column=0, columnspan=1, pady=(0, 10))
         self.final_dir_entry = tk.Entry(
@@ -127,6 +136,7 @@ class gst_utils_ui(base_ui):
             text="Start Processing",
             command=start_button,
             **self.theme,
+            font=self.FONTS["buttons"]["medium"],
         )
         self.start_gstr_1_process_button.grid(row=10, column=0, columnspan=4)
 
@@ -136,6 +146,7 @@ class gst_utils_ui(base_ui):
             text="Open the Destination Directory after Finish",
             variable=self.open_final_dir_var,
             **self.theme,
+            font=self.FONTS["small_bold"],
             activebackground=self.bg,
             activeforeground=self.fg,
             highlightcolor=self.bg,
@@ -149,6 +160,7 @@ class gst_utils_ui(base_ui):
             self.ui,
             text="Status - Ready to Process",
             **self.theme,
+            font=self.FONTS["small_bold"],
             padx=5,
             pady=5,
         )

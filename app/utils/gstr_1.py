@@ -275,8 +275,8 @@ def start_window_app():
     global gstr_1_ui, force_close, extract_invoice_options
 
     gstr_1_ui = gst_utils_ui(
-        window_title="GSTR 1 Utils",
-        title="GSTR 1 Utility",
+        window_title="GSTR 1 Utilities",
+        title="Convert GSTR 1 JSON to Excel or Consumable JSON",
         commands={
             "app_generation": set_app_generation_mode,
             "app_processing": set_app_processing_mode,
@@ -286,8 +286,7 @@ def start_window_app():
                 "command": set_extract_invoice_config,
             },
         },
-        start_button=start_gstr_1_process,
-        menu=True,
+        start_button=start_gstr_1_process
     )
 
     gstr_1_ui.ui.protocol("WM_DELETE_WINDOW", initiate_force_close)

@@ -25,7 +25,9 @@ class loader_window:
         )
         self.loader.pack()
 
-        self.label = tk.Label(master=self.ui, text=text, **master.theme)
+        self.label = tk.Label(
+            master=self.ui, text=text, **master.theme, font=master.FONTS["small_bold"]
+        )
         self.label.pack()
         self.loader.start()
         self.ui.focus_force()

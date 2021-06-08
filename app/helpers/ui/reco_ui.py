@@ -3,10 +3,14 @@ from app.helpers.ui.base import base_ui
 
 
 class gst_reco_ui(base_ui):
-    def __init__(self, window_title, title, button_commands, menu):
+    def __init__(self, window_title, title, button_commands):
         maxcol = 8
         super(gst_reco_ui, self).__init__(
-            window_title=window_title, title=title, menu=menu, maxcol=maxcol
+            window_title=window_title,
+            title=title,
+            menu=False,
+            logo=False,
+            maxcol=maxcol,
         )
 
         self.button_commands = button_commands
@@ -15,11 +19,15 @@ class gst_reco_ui(base_ui):
             self.ui,
             text="Project: Not Initialized",
             **self.theme,
+            font=self.FONTS["small"],
         )
         self.project_init_status.grid(row=3, column=0, columnspan=maxcol, pady=(0, 10))
 
         self.project_command_label = tk.Label(
-            self.ui, text="Manage Project", **self.theme,
+            self.ui,
+            text="Manage Project",
+            **self.theme,
+            font=self.FONTS["small"],
         )
         self.project_command_label.grid(row=4, column=0, columnspan=maxcol)
 
@@ -30,6 +38,7 @@ class gst_reco_ui(base_ui):
                     self.ui,
                     text=button_key,
                     command=button_props["command"],
+                    font=self.FONTS["small_bold"],
                     **self.theme,
                 )
                 self.project_command_buttons[button_key].grid(
@@ -44,6 +53,7 @@ class gst_reco_ui(base_ui):
             text=button_commands["reset_button"]["title"],
             command=button_commands["reset_button"]["command"],
             **self.theme,
+            font=self.FONTS["small_bold"],
         )
         self.reset_button.grid(
             row=button_commands["reset_button"]["row"],
@@ -57,6 +67,7 @@ class gst_reco_ui(base_ui):
             text=button_commands["start_button"]["title"],
             command=button_commands["start_button"]["command"],
             **self.theme,
+            font=self.FONTS["buttons"]["medium"],
         )
         self.start_button.grid(
             row=button_commands["start_button"]["row"],

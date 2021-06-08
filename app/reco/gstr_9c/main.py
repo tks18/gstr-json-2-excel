@@ -16,7 +16,7 @@ def initialize_project():
         "branch": "Branch Name (State)",
     }
     project_pop_window = text_box_window(
-        master=gstr_9c_ui.ui,
+        master=gstr_9c_ui,
         title="Enter the Details Required",
         labels=pre_config_questions,
     )
@@ -94,10 +94,9 @@ def start_window_app():
         },
     }
     gstr_9c_ui = gst_reco_ui(
-        window_title="GSTR 9C Reco Utility",
-        title="GSTR 9C Utility",
+        window_title="GSTR 9C Reconciliation",
+        title="Reconcile your Ledger with GSTR 1 & 3B to Prepare 9C",
         button_commands=command_config,
-        menu=True,
     )
     gstr_9c_ui.initialize_engine()
 

@@ -10,7 +10,7 @@ def main_ui_window():
     global main_ui
 
     main_ui = main_window(
-        window_title="GSTR Utils by Shan.tk",
+        window_title="GSTR Utilities",
         title="GST Utilities",
         buttons={
             "utility_buttons": [

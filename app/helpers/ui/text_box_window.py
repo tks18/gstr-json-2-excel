@@ -19,9 +19,14 @@ class text_box_window:
                 self.ui,
                 text=f"{label_text}: ",
                 **master.theme,
+                font=master.FONTS["buttons"]["small"],
             )
             self.label[label_key].grid(
-                row=row_no, column=0, columnspan=1, padx=5, pady=5
+                row=row_no,
+                column=0,
+                columnspan=1,
+                padx=5,
+                pady=5,
             )
 
             self.text_box[label_key] = tk.Entry(
@@ -49,6 +54,7 @@ class text_box_window:
             text="Accept",
             command=self.accept_action,
             **master.theme,
+            font=master.FONTS["buttons"]["small"],
         )
         self.accept_button.grid(row=row_no + 1, column=0, columnspan=2)
 
@@ -57,6 +63,7 @@ class text_box_window:
             text="Cancel",
             command=self.accept_action,
             **master.theme,
+            font=master.FONTS["buttons"]["small"],
         )
         self.cancel_button.grid(row=row_no + 1, column=1, columnspan=2)
 

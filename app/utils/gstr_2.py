@@ -265,8 +265,8 @@ def start_window_app():
     global gstr_2_ui, force_close
 
     gstr_2_ui = gst_utils_ui(
-        window_title="GSTR 2A Utils",
-        title="GSTR 2A Utility",
+        window_title="GSTR 2A Utilities",
+        title="Convert GSTR 2A JSON to Excel or Consumable JSON",
         commands={
             "app_generation": set_app_generation_mode,
             "app_processing": set_app_processing_mode,
@@ -277,7 +277,6 @@ def start_window_app():
             },
         },
         start_button=start_gstr_2_process,
-        menu=True,
     )
 
     gstr_2_ui.ui.protocol("WM_DELETE_WINDOW", initiate_force_close)
