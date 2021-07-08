@@ -5,8 +5,8 @@ from tkinter import messagebox
 from openpyxl import Workbook
 
 # Other Imports
-from app.helpers.ui.utils_ui import gst_utils_ui
-from app.helpers.ui.loader_window import loader_window
+from app.helpers.ui.main_windows.utils_ui import gst_utils_ui
+from app.helpers.ui.sub_windows.loader_window import loader_window
 from app.helpers.utilities.invoice_writer import invoices_writer
 from app.helpers.utilities.path_helpers import (
     get_user_json_directory,

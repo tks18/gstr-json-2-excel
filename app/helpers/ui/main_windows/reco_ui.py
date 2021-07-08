@@ -1,5 +1,4 @@
-import tkinter as tk
-from app.helpers.ui.base import base_ui
+from app.helpers.ui.helpers.base import base_ui
 
 
 class gst_reco_ui(base_ui):
@@ -15,31 +14,21 @@ class gst_reco_ui(base_ui):
 
         self.button_commands = button_commands
 
-        self.project_init_status = tk.Label(
-            self.ui,
-            text="Project: Not Initialized",
-            **self.theme,
-            font=self.FONTS["small"],
+        self.project_init_status = self.elements.small_lbl(
+            self, text="Project: Not Initialized", bold=False
         )
         self.project_init_status.grid(row=3, column=0, columnspan=maxcol, pady=(0, 10))
 
-        self.project_command_label = tk.Label(
-            self.ui,
-            text="Manage Project",
-            **self.theme,
-            font=self.FONTS["small"],
+        self.project_command_label = self.elements.small_lbl(
+            self, text="Manage Project", bold=False
         )
         self.project_command_label.grid(row=4, column=0, columnspan=maxcol)
 
         self.project_command_buttons = {}
         for buttons in button_commands["project_commands"]:
             for (button_key, button_props) in buttons.items():
-                self.project_command_buttons[button_key] = tk.Button(
-                    self.ui,
-                    text=button_key,
-                    command=button_props["command"],
-                    font=self.FONTS["small_bold"],
-                    **self.theme,
+                self.project_command_buttons[button_key] = self.elements.small_btn(
+                    self, label=button_key, command=button_props["command"]
                 )
                 self.project_command_buttons[button_key].grid(
                     row=button_props["row"],
@@ -48,12 +37,10 @@ class gst_reco_ui(base_ui):
                     pady=5,
                     padx=5,
                 )
-        self.reset_button = tk.Button(
-            self.ui,
-            text=button_commands["reset_button"]["title"],
+        self.reset_button = self.elements.small_btn(
+            self,
+            label=button_commands["reset_button"]["title"],
             command=button_commands["reset_button"]["command"],
-            **self.theme,
-            font=self.FONTS["small_bold"],
         )
         self.reset_button.grid(
             row=button_commands["reset_button"]["row"],
@@ -62,12 +49,10 @@ class gst_reco_ui(base_ui):
         )
         self.reset_button.grid_remove()
 
-        self.start_button = tk.Button(
-            self.ui,
-            text=button_commands["start_button"]["title"],
+        self.start_button = self.elements.medium_btn(
+            self,
+            label=button_commands["start_button"]["title"],
             command=button_commands["start_button"]["command"],
-            **self.theme,
-            font=self.FONTS["buttons"]["medium"],
         )
         self.start_button.grid(
             row=button_commands["start_button"]["row"],

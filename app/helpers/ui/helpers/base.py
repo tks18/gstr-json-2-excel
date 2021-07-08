@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
-
 from app.helpers.utilities.path_helpers import resource_path
 
-from app.helpers.ui.theme_constants import *
+from app.helpers.ui.helpers.theme_constants import *
+from app.helpers.ui.elements.init_class import tk_elements
 
 
 class base_ui:
@@ -18,36 +18,25 @@ class base_ui:
         self.ui.config(padx=20, pady=20, bg=self.bg)
         self.icon = tk.PhotoImage(file=resource_path("images/logo.png"))
         self.ui.iconphoto(False, self.icon)
+        self.elements = tk_elements()
 
         if menu:
-            self.menu_button = tk.Button(
-                self.ui,
-                text="Menu",
-                command=self.close_window,
-                **self.theme,
-                font=self.FONTS["buttons"]["small"],
+            self.menu_button = self.elements.small_btn(
+                self, label="Menu", command=self.close_window
             )
             self.menu_button.grid(
                 row=0,
                 column=0,
             )
 
-            self.about_button = tk.Button(
-                self.ui,
-                text="About",
-                **self.theme,
-                font=self.FONTS["buttons"]["small"],
+            self.about_button = self.elements.small_btn(
+                self, label="About", command=self.close_window
             )
             self.about_button.grid(row=0, column=1)
 
-        self.main_title = tk.Label(
-            master=self.ui,
-            text=title,
-            font=self.FONTS["medium_bold"],
-            **self.theme,
-        )
-        self.ui.focus_force()
+        self.main_title = self.elements.medium_lbl(self, text=title, bold=True)
         self.main_title.grid(row=1, column=0, columnspan=maxcol, pady=(10, 10))
+        self.ui.focus_force()
 
         if logo:
             self.canvas = tk.Canvas(
@@ -65,21 +54,15 @@ class base_ui:
         )
         self.style.theme_use("gstr_theme")
 
-        self.developer_label_head = tk.Label(
-            self.ui,
-            text="Developed by",
-            font=self.FONTS["small_bold"],
-            **self.theme,
+        self.developer_label_head = self.elements.small_lbl(
+            self, text="Developed by", bold=False
         )
         self.developer_label_head.grid(
             row=20, column=0, columnspan=maxcol, pady=(20, 0)
         )
 
-        self.developer_label_value = tk.Label(
-            self.ui,
-            text="Shan.tk",
-            font=self.FONTS["small_bold"],
-            **self.theme,
+        self.developer_label_value = self.elements.small_lbl(
+            self, text="Shan.tk", bold=True
         )
         self.developer_label_value.grid(
             row=21, column=0, columnspan=maxcol, pady=(0, 0)
