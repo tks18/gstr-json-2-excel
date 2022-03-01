@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['G:\\Development Projects\\Python Projects\\gstr-json-2-excel'],
+             pathex=['D:\\Python Projects\\gstr-json-2-excel'],
              binaries=[],
              datas=[('images/logo.png', 'gstr-utils-images'), ('images/logo.ico', 'gstr-utils-images'), ('fonts/Roboto-Bold.ttf', 'gstr-utils-fonts'), ('fonts/Roboto-Regular.ttf', 'gstr-utils-fonts')],
              hiddenimports=[],
@@ -29,7 +29,7 @@ exe = EXE(pyz,
           upx=True,
           console=False,
           version='version.txt',
-          icon='G:\\Development Projects\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')
+          icon='D:\\Python Projects\\gstr-json-2-excel\\images\\logo.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

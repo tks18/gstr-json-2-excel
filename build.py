@@ -22,6 +22,8 @@ for (spec, spec_props) in SPECS.items():
             "-y",
             "--upx-dir",
             "upx",
+            "--exclude-module",
+            "_bootlocale",
         ]
     )
     if spec == "UNBUNDLED":
