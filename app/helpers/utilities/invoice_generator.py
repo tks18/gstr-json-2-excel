@@ -5,7 +5,7 @@ from app.helpers.threader import threader
 
 def gen_invoices_function(sales_data, sales_type, invoice_term, gen_json, file_name):
     invoice_list = []
-    if not sales_type == "b2cs":
+    if not sales_type in ["b2cs", "b2csa", "cdnur"]:
         for sales in sales_data[sales_type]:
             current_supplier = sales.copy()
             current_supplier.pop(invoice_term)
@@ -23,13 +23,30 @@ def gen_invoices_function(sales_data, sales_type, invoice_term, gen_json, file_n
                     invoice_list.append({**current_supplier, **flattened_inv})
 
         if gen_json:
-            with open(file_name, mode="w") as b2b_sales_data:
-                json.dump(invoice_list, b2b_sales_data)
+            with open(file_name, mode="w") as json_export_data:
+                json.dump(invoice_list, json_export_data)
 
-    else:
+    elif sales_type in ["b2cs", "cdnur"]:
         for invoice in sales_data[sales_type]:
             flattened_invoice = flatten(invoice)
             invoice_list.append(flattened_invoice)
+
+        if gen_json:
+            with open(file_name, mode="w") as json_export_data:
+                json.dump(invoice_list, json_export_data)
+
+    elif sales_type in ["b2csa"]:
+        for invoice in sales_data[sales_type]:
+            current_invoice = invoice.copy()
+            current_invoice.pop("itms")
+            for inv_itms in invoice["itms"]:
+                flattened_inv = flatten(inv_itms)
+                full_inv_itm = {**current_invoice, **flattened_inv}
+                invoice_list.append(full_inv_itm)
+
+        if gen_json:
+            with open(file_name, mode="w") as json_export_data:
+                json.dump(invoice_list, json_export_data)
 
     return invoice_list
 
@@ -46,5 +63,6 @@ def generate_invoices_list(sales_data, sales_type, invoice_term, gen_json, file_
     gen_invoices_thread.start()
     invoice_list = gen_invoices_thread.join()
     if gen_invoices_thread.error is not None:
+        print(f"Invoice Gen Error: {gen_invoices_thread.error}")
         raise gen_invoices_thread.error
     return invoice_list

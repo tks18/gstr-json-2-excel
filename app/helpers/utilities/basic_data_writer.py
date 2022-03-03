@@ -45,4 +45,5 @@ def write_basic_data_sheet(work_book, basic_data, heading_map):
     basic_data_thread.start()
     basic_data_thread.join()
     if basic_data_thread.error is not None:
+        print(f"Basic Data Error: {basic_data_thread.error}")
         raise basic_data_thread.error

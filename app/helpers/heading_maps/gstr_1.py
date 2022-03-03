@@ -52,11 +52,40 @@ b2b_credit_notes_headings_map = {
     "chksum": "Check Sum",
 }
 
+b2c_credit_notes_headings_map = {
+    "nt_num": "Credit Note No",
+    "nt_dt": "Credit Note Date",
+    "idt": "Invoice Date",
+    "itms_0_itm_det_rt": "Rate",
+    "val": "Invoice Value",
+    "flag": "Flag",
+    "ntty": "Invoice Type",
+    "typ": "Credit Note Type",
+    "itms_0_num": "Rate Number",
+    "itms_0_itm_det_txval": "Taxable Value",
+    "inum": "Original Invoice Number",
+    "chksum": "Check Sum",
+}
+
 b2cs_sales_heading_map = {
     "samt": "SGST",
     "camt": "CGST",
     "typ": "Type",
     "flag": "Flag",
+    "sply_ty": "Supply Type",
+    "chksum": "Check Sum",
+    "iamt": "IGST",
+    "txval": "Taxable Value",
+    "rt": "Rate",
+    "pos": "Place of Supply",
+}
+
+b2csa_heading_map = {
+    "samt": "SGST",
+    "camt": "CGST",
+    "typ": "Type",
+    "flag": "Flag",
+    "omon": "Amended Month",
     "sply_ty": "Supply Type",
     "chksum": "Check Sum",
     "iamt": "IGST",

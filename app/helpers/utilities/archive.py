@@ -14,4 +14,5 @@ def make_archive(path_to_files, file_name):
     archive_thread.start()
     archive_thread.join()
     if archive_thread.error is not None:
+        print(f"Archive Error: {archive_thread.error}")
         raise archive_thread.error

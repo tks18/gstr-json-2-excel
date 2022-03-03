@@ -52,4 +52,5 @@ def write_invoices_to_excel(work_sheet, invoice_list, heading_map, heading_list)
     invoices_to_excel_thread.start()
     invoices_to_excel_thread.join()
     if invoices_to_excel_thread.error is not None:
+        print(f"Invoice Writer Error: {invoices_to_excel_thread.error}")
         raise invoices_to_excel_thread.error

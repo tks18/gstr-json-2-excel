@@ -21,7 +21,17 @@ from app.helpers.heading_maps.gstr_1 import *
 
 def generate_basic_data(path_to_json):
 
-    not_required_keys = ["b2b", "cdnr", "exp", "b2cs", "b2cl", "b2ba", "hsn"]
+    not_required_keys = [
+        "b2b",
+        "cdnr",
+        "exp",
+        "b2cs",
+        "b2cl",
+        "b2ba",
+        "hsn",
+        "b2csa",
+        "cdnur",
+    ]
     data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
         if key in data:
@@ -59,12 +69,26 @@ def write_all_invoices(
         "heading_map": b2b_credit_notes_headings_map,
         "file_name": file_directory + "/" + file_name + "_GSTR1_b2b_sales_returns.json",
     }
+    b2c_cdnr_config = {
+        "title": "B2C Credit Notes",
+        "list_name": "cdnur",
+        "invoice_item_name": "nt",
+        "heading_map": b2c_credit_notes_headings_map,
+        "file_name": file_directory + "/" + file_name + "_GSTR1_b2c_sales_returns.json",
+    }
     b2cs_config = {
         "title": "B2C Small",
         "list_name": "b2cs",
         "invoice_item_name": "inv",
         "heading_map": b2cs_sales_heading_map,
         "file_name": file_directory + "/" + file_name + "_GSTR1_b2cs_sales.json",
+    }
+    b2csa_config = {
+        "title": "B2CS Amendments",
+        "list_name": "b2csa",
+        "invoice_item_name": "inv",
+        "heading_map": b2csa_heading_map,
+        "file_name": file_directory + "/" + file_name + "_GSTR1_b2csa_sales.json",
     }
     export_config = {
         "title": "Exports",
@@ -74,7 +98,7 @@ def write_all_invoices(
         "file_name": file_directory + "/" + file_name + "_GSTR1_export_sales.json",
     }
     b2ba_config = {
-        "title": "B2B-Amendments",
+        "title": "B2B Amendments",
         "list_name": "b2ba",
         "invoice_item_name": "inv",
         "heading_map": b2ba_heading_map,
@@ -87,6 +111,10 @@ def write_all_invoices(
         invoice_config_list.append(b2b_cdnr_config)
     if config_map["b2cs"]:
         invoice_config_list.append(b2cs_config)
+    if config_map["cdnur"]:
+        invoice_config_list.append(b2c_cdnr_config)
+    if config_map["b2csa"]:
+        invoice_config_list.append(b2csa_config)
     if config_map["exp"]:
         invoice_config_list.append(export_config)
     if config_map["b2ba"]:
@@ -313,6 +341,8 @@ extract_invoice_options = {
     "b2cs": "B2C Small Invoices",
     "exp": "Export Invoices",
     "b2ba": "B2B Amendments",
+    "b2csa": "B2CS Amendments",
+    "cdnur": "Credit Notes - Unregistered",
 }
 extract_invoice_default_options = {
     "b2b": True,
@@ -320,6 +350,8 @@ extract_invoice_default_options = {
     "b2cs": True,
     "exp": True,
     "b2ba": True,
+    "b2csa": True,
+    "cdnur": True,
 }
 
 
