@@ -74,11 +74,11 @@ def write_all_invoices(
         "file_name": file_directory + "/" + file_name + "_GSTR_2A_b2ba_sales.json",
     }
 
-    if config_map["all"] or config_map["b2b"]:
+    if config_map["b2b"]:
         invoice_config_list.append(b2b_config)
-    if config_map["all"] or config_map["b2b_cdnr"]:
+    if config_map["b2b_cdnr"]:
         invoice_config_list.append(b2b_cdnr_config)
-    if config_map["all"] or config_map["b2ba"]:
+    if config_map["b2ba"]:
         invoice_config_list.append(b2ba_config)
 
     if gen_excel:
@@ -118,8 +118,8 @@ def start_gstr_2_process():
 
     user_input_dirs = get_user_json_directory(
         app_generation_mode=app_generation_mode,
-        source_dir_entry=gstr_2_ui.source_dir_label,
-        final_dir_entry=gstr_2_ui.final_dir_label,
+        source_dir_entry=gstr_2_ui.source_dir_entry,
+        final_dir_entry=gstr_2_ui.final_dir_entry,
         status_text=gstr_2_ui.app_status_text,
     )
 
