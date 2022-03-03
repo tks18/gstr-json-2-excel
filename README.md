@@ -17,10 +17,11 @@ Open Source GSTR 1/GSTR 2A JSON to Excel utility based on Python. Useful for Aud
 * Exports
 * B2C Sales
 * B2B Amended Invoices
+* B2C Amended Invoices
+* Unregistered Credit Notes
 
 ### To be Done
 
-* B2C Amended Invoices
 * HSN Summary
 
 **_If You are Interested in this Project. Pull Requests are Welcomed if it is worthy to Merge_**
