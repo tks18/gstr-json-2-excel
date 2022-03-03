@@ -272,7 +272,7 @@ def initiate_force_close():
 
 
 def start_window_app():
-    global gstr_1_ui, force_close, extract_invoice_options
+    global gstr_1_ui, force_close, extract_invoice_options, extract_invoice_default_options
 
     gstr_1_ui = gst_utils_ui(
         window_title="GSTR 1 Utilities",
@@ -282,6 +282,7 @@ def start_window_app():
             "app_processing": set_app_processing_mode,
             "invoice_extract_options": {
                 "options": extract_invoice_options,
+                "default_vals": extract_invoice_default_options,
                 "default": "All Invoices",
                 "command": set_extract_invoice_config,
             },
@@ -312,6 +313,13 @@ extract_invoice_options = {
     "b2cs": "B2C Small Invoices",
     "exp": "Export Invoices",
     "b2ba": "B2B Amendments",
+}
+extract_invoice_default_options = {
+    "b2b": True,
+    "b2b_cdnr": True,
+    "b2cs": True,
+    "exp": True,
+    "b2ba": True,
 }
 
 
