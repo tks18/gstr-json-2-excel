@@ -70,7 +70,13 @@ class gst_utils_ui(base_ui):
             command=self.wait_for_checkbox_selector,
         )
 
-        self.invoice_extract_options_selected = None
+        self.invoice_extract_options_selected = {
+            "b2b": True,
+            "b2b_cdnr": True,
+            "b2cs": True,
+            "exp": True,
+            "b2ba": True,
+        }
         self.invoices_config_options = commands["invoice_extract_options"]["options"]
 
         self.invoice_config_button.grid(row=7, column=0, columnspan=4)

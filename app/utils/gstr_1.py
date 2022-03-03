@@ -286,7 +286,7 @@ def start_window_app():
                 "command": set_extract_invoice_config,
             },
         },
-        start_button=start_gstr_1_process
+        start_button=start_gstr_1_process,
     )
 
     gstr_1_ui.ui.protocol("WM_DELETE_WINDOW", initiate_force_close)
