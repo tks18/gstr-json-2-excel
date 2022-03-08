@@ -4,7 +4,7 @@
 
 Open Source GSTR 1/GSTR 2A JSON to Excel utility based on Python. Useful for Auditors in Verifying GSTR 1 Return Invoices with Ledgers
 
-### Download Latest Verion - [V2.7.0](https://github.com/tks18/gstr-json-2-excel/releases/download/v2.7.0/Gstr.Utils.exe)
+### Download Latest Verion - [V2.8.0](https://github.com/tks18/gstr-json-2-excel/releases/download/v2.8.0/Gstr.Utils.exe)
 
 ### Screenshots
 
@@ -13,11 +13,15 @@ Open Source GSTR 1/GSTR 2A JSON to Excel utility based on Python. Useful for Aud
 ### Currently Working Methods for Both GSTR 1/2A
 
 - B2B Invoices
-- B2B Credit Notes
-- Exports
-- B2C Sales
 - B2B Amended Invoices
+- B2B Credit Notes
+- B2B Credit Note Amended Invoices
+- Exports
+- Exports Amended Invoices
+- B2C Sales
 - B2C Amended Invoices
+- B2C Credit Notes
+- B2C Credit Note Amended Invoices
 - Unregistered Credit Notes
 
 ### To be Done
