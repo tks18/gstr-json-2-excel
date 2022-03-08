@@ -65,6 +65,11 @@ b2c_credit_notes_headings_map = {
     "itms_0_itm_det_txval": "Taxable Value",
     "inum": "Original Invoice Number",
     "chksum": "Check Sum",
+    "d_flag": "D Flag",
+    "itms_0_itm_det_iamt": "IGST",
+    "itms_0_itm_det_camt": "CGST",
+    "itms_0_itm_det_samt": "SGST",
+    "itms_0_itm_det_csamt": "Cess",
 }
 
 b2cs_sales_heading_map = {
@@ -105,6 +110,44 @@ export_headings_map = {
     "chksum": "Check Sum",
     "itms_0_txval": "Taxable Value",
     "inum": "Invoice Number",
+}
+
+export_amendments_headings_map = {
+    "exp_typ": "Export Type",
+    "itms_0_csamt": "Cess",
+    "itms_0_rt": "Rate",
+    "itms_0_txval": "Taxable Value",
+    "idt": "Invoice Date",
+    "itms_0_iamt": "IGST",
+    "flag": "Flag",
+    "val": "Invoice Value",
+    "oinum": "Old Invoice Number",
+    "oidt": "Old Invoice Date",
+    "chksum": "Checksum",
+}
+
+b2b_credit_note_amendments_headings_map = {
+    "cflag": "C Flag",
+    "cfs": "CFS",
+    "chksum": "Checksum",
+    "ctin": "GSTIN",
+    "flag": "Flag",
+    "idt": "Invoice Date",
+    "inum": "Invoice Number",
+    "itms_0_itm_det_iamt": "IGST",
+    "itms_0_itm_det_camt": "CGST",
+    "itms_0_itm_det_samt": "SGST",
+    "itms_0_itm_det_rt": "Rate",
+    "itms_0_itm_det_txval": "Taxable Value",
+    "itms_0_num": "Rate Number",
+    "ntty": "CDNR Rate",
+    "nt_dt": "Credit Note Date",
+    "nt_num": "Credit Note Number",
+    "ont_dt": "Old Credit Note Date",
+    "ont_num": "Old Credit Note Number",
+    "p_gst": "PGST",
+    "updby": "Updated by",
+    "val": "Invoice Value",
 }
 
 b2ba_heading_map = {

@@ -28,8 +28,17 @@ def gen_invoices_function(sales_data, sales_type, invoice_term, gen_json, file_n
 
     elif sales_type in ["b2cs", "cdnur"]:
         for invoice in sales_data[sales_type]:
-            flattened_invoice = flatten(invoice)
-            invoice_list.append(flattened_invoice)
+            current_invoice = invoice.copy()
+            if "itms" in current_invoice and len(invoice["itms"]) > 1:
+                current_invoice.pop("itms")
+                for current_inv_item in invoice["itms"]:
+                    new_invoice = current_invoice.copy()
+                    new_invoice["itms"] = [current_inv_item]
+                    flattened_inv = flatten(new_invoice)
+                    invoice_list.append(flattened_inv)
+            else:
+                flattened_inv = flatten(invoice)
+                invoice_list.append(flattened_inv)
 
         if gen_json:
             with open(file_name, mode="w") as json_export_data:
@@ -47,6 +56,12 @@ def gen_invoices_function(sales_data, sales_type, invoice_term, gen_json, file_n
         if gen_json:
             with open(file_name, mode="w") as json_export_data:
                 json.dump(invoice_list, json_export_data)
+
+    elif sales_type == "cdna":
+        for invoice in sales_data[sales_type]:
+            for inv_itms in invoice["itms"]:
+                flattened_inv = flatten(inv_itms)
+                invoice_list.append(flattened_inv)
 
     return invoice_list
 

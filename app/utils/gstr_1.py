@@ -31,6 +31,9 @@ def generate_basic_data(path_to_json):
         "hsn",
         "b2csa",
         "cdnur",
+        "expa",
+        "cdnra",
+        "doc_issue"
     ]
     data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
@@ -69,6 +72,16 @@ def write_all_invoices(
         "heading_map": b2b_credit_notes_headings_map,
         "file_name": file_directory + "/" + file_name + "_GSTR1_b2b_sales_returns.json",
     }
+    b2b_cdnr_amendments_config = {
+        "title": "B2B Credit Note Amendments",
+        "list_name": "cdnra",
+        "invoice_item_name": "nt",
+        "heading_map": b2b_credit_note_amendments_headings_map,
+        "file_name": file_directory
+        + "/"
+        + file_name
+        + "_GSTR1_b2b_sales_returns_amendments.json",
+    }
     b2c_cdnr_config = {
         "title": "B2C Credit Notes",
         "list_name": "cdnur",
@@ -97,6 +110,16 @@ def write_all_invoices(
         "heading_map": export_headings_map,
         "file_name": file_directory + "/" + file_name + "_GSTR1_export_sales.json",
     }
+    export_amendments_config = {
+        "title": "Export Amendments",
+        "list_name": "expa",
+        "invoice_item_name": "inv",
+        "heading_map": export_amendments_headings_map,
+        "file_name": file_directory
+        + "/"
+        + file_name
+        + "_GSTR1_export_sales_amendments.json",
+    }
     b2ba_config = {
         "title": "B2B Amendments",
         "list_name": "b2ba",
@@ -117,8 +140,12 @@ def write_all_invoices(
         invoice_config_list.append(b2csa_config)
     if config_map["exp"]:
         invoice_config_list.append(export_config)
+    if config_map["expa"]:
+        invoice_config_list.append(export_amendments_config)
     if config_map["b2ba"]:
         invoice_config_list.append(b2ba_config)
+    if config_map["cdnra"]:
+        invoice_config_list.append(b2b_cdnr_amendments_config)
 
     if gen_excel:
         write_basic_data_sheet(
@@ -343,6 +370,8 @@ extract_invoice_options = {
     "b2ba": "B2B Amendments",
     "b2csa": "B2CS Amendments",
     "cdnur": "Credit Notes - Unregistered",
+    "expa": "Exports - Amendments",
+    "cdnra": "Credit Notes - Amendments",
 }
 extract_invoice_default_options = {
     "b2b": True,
@@ -352,6 +381,8 @@ extract_invoice_default_options = {
     "b2ba": True,
     "b2csa": True,
     "cdnur": True,
+    "expa": True,
+    "cdnra": True,
 }
 
 
