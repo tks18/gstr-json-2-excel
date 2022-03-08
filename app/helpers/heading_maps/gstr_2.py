@@ -26,6 +26,28 @@ b2b_heading_map = {
     "dtcancel": "Date of Cancel(if)",
 }
 
+cdna_heading_map = {
+    "inum": "Invoice Number",
+    "nt_dt": "Credit Note Date",
+    "itms_0_itm_det_camt": "CGST",
+    "chksum": "Check Sum",
+    "fldtr1": "Filing Date",
+    "nt_num": "Credit Note Number",
+    "val": "Invoice Value",
+    "itms_0_num": "Rate Number",
+    "idt": "Invoice Date",
+    "ntty": "Credit Note Type",
+    "itms_0_itm_det_iamt": "IGST",
+    "itms_0_itm_det_samt": "SGST",
+    "cfs3b": "GSTR 3B",
+    "flprdr1": "Filing Period",
+    "p_gst": "P GST",
+    "itms_0_itm_det_txval": "Taxable Value",
+    "cfs": "CFS",
+    "itms_0_itm_det_rt": "Rate",
+    "ctin": "GSTIN",
+}
+
 b2b_credit_notes_headings_map = {
     "inum": "Invoice Number",
     "nt_dt": "Credit Note Date",

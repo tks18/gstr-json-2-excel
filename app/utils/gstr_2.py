@@ -25,6 +25,7 @@ def generate_basic_data(path_to_json):
         "b2b",
         "cdn",
         "b2ba",
+        "cdna",
     ]
     data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
@@ -66,6 +67,13 @@ def write_all_invoices(
         + file_name
         + "_GSTR_2A_b2b_sales_returns.json",
     }
+    cdna_config = {
+        "title": "B2B-Amendments",
+        "list_name": "b2ba",
+        "invoice_item_name": "inv",
+        "heading_map": cdna_heading_map,
+        "file_name": file_directory + "/" + file_name + "_GSTR_2A_cdnaa_sales.json",
+    }
     b2ba_config = {
         "title": "B2B-Amendments",
         "list_name": "b2ba",
@@ -80,6 +88,8 @@ def write_all_invoices(
         invoice_config_list.append(b2b_cdnr_config)
     if config_map["b2ba"]:
         invoice_config_list.append(b2ba_config)
+    if config_map["cdna"]:
+        invoice_config_list.append(cdna_config)
 
     if gen_excel:
         write_basic_data_sheet(
@@ -149,6 +159,7 @@ def start_gstr_2_process():
                     path_to_json=json_file,
                 )
 
+                print(basic_data)
                 file_name = basic_data["gstin"] + "_" + basic_data["fp"]
                 file_directory = (
                     user_input_dirs["final_dir"] + "/" + file_name
@@ -301,11 +312,13 @@ extract_invoice_options = {
     "b2b": "B2B Invoices",
     "b2b_cdnr": "B2B Credit Notes",
     "b2ba": "B2B Amendments",
+    "cdna": "Credit Note Amendments",
 }
 extract_invoice_default_options = {
     "b2b": True,
     "b2b_cdnr": True,
     "b2ba": True,
+    "cdna": True,
 }
 
 create_file_dir_modes = ["excel-json", "zipped", "json"]
