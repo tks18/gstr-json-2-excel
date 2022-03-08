@@ -72,6 +72,20 @@ b2c_credit_notes_headings_map = {
     "itms_0_itm_det_csamt": "Cess",
 }
 
+b2c_credit_note_amendments_headings_map = {
+    "chksum": "Checksum",
+    "d_flag": "D Flag",
+    "flag": "Flag",
+    "itms_0_itm_det_rt": "Rate",
+    "itms_0_itm_det_txval": "Taxable Value",
+    "itms_0_num": "Rate Number",
+    "ntty": "Invoice Type",
+    "nt_dt": "Invoice Date",
+    "nt_num": "Invoice Number",
+    "typ": "Type",
+    "val": "Invoice Value",
+}
+
 b2cs_sales_heading_map = {
     "samt": "SGST",
     "camt": "CGST",

@@ -33,7 +33,8 @@ def generate_basic_data(path_to_json):
         "cdnur",
         "expa",
         "cdnra",
-        "doc_issue"
+        "doc_issue",
+        "cdnura",
     ]
     data = get_json_sales_data(path_to_json)
     for key in not_required_keys:
@@ -88,6 +89,16 @@ def write_all_invoices(
         "invoice_item_name": "nt",
         "heading_map": b2c_credit_notes_headings_map,
         "file_name": file_directory + "/" + file_name + "_GSTR1_b2c_sales_returns.json",
+    }
+    b2c_cdnr_amendments_config = {
+        "title": "B2C Credit Note Amendments",
+        "list_name": "cdnur",
+        "invoice_item_name": "nt",
+        "heading_map": b2c_credit_note_amendments_headings_map,
+        "file_name": file_directory
+        + "/"
+        + file_name
+        + "_GSTR1_b2c_sales_return_amendments.json",
     }
     b2cs_config = {
         "title": "B2C Small",
@@ -146,6 +157,8 @@ def write_all_invoices(
         invoice_config_list.append(b2ba_config)
     if config_map["cdnra"]:
         invoice_config_list.append(b2b_cdnr_amendments_config)
+    if config_map["cdnura"]:
+        invoice_config_list.append(b2c_cdnr_amendments_config)
 
     if gen_excel:
         write_basic_data_sheet(
@@ -372,6 +385,7 @@ extract_invoice_options = {
     "cdnur": "Credit Notes - Unregistered",
     "expa": "Exports - Amendments",
     "cdnra": "Credit Notes - Amendments",
+    "cdnura": "Credit Notes Unreg Amendments",
 }
 extract_invoice_default_options = {
     "b2b": True,
@@ -383,6 +397,7 @@ extract_invoice_default_options = {
     "cdnur": True,
     "expa": True,
     "cdnra": True,
+    "cdnura": True,
 }
 
 
